@@ -120,6 +120,20 @@
     text-transform: uppercase;
     letter-spacing: .045em;
     padding-bottom: 9px;
+    cursor: pointer;
+    user-select: none;
+  }
+
+  .head-status.active {
+    color: #1155cc;
+  }
+
+  .head-status.active .counter {
+    color: #1155cc;
+  }
+
+  .show-row.is-filtered-out {
+    display: none;
   }
 
   .counter {
@@ -255,19 +269,19 @@
 
   <div class="table-head">
     <div class="head-spacer"></div>
-    <div class="head-status">
+    <div class="head-status" data-status="seen" role="button" tabindex="0" aria-pressed="false">
       <span class="counter" id="seenCount">0</span>
       Seen
     </div>
-    <div class="head-status">
+    <div class="head-status" data-status="want" role="button" tabindex="0" aria-pressed="false">
       <span class="counter" id="wantCount">0</span>
       Want to see
     </div>
-    <div class="head-status">
+    <div class="head-status" data-status="dontwant" role="button" tabindex="0" aria-pressed="false">
       <span class="counter" id="dontWantCount">0</span>
       Don’t want to see
     </div>
-    <div class="head-status">
+    <div class="head-status" data-status="never" role="button" tabindex="0" aria-pressed="false">
       <span class="counter" id="neverCount">0</span>
       Never heard of it
     </div>
@@ -2447,8 +2461,42 @@
 
   window.addEventListener("hashchange", loadFromUrl);
 
+  const headStatuses = [...document.querySelectorAll(".head-status[data-status]")];
+  let activeFilter = null;
+
+  function applyFilter() {
+    rows.forEach(row => {
+      const checked = row.querySelector(".status-box:checked");
+      const status = checked ? checked.dataset.status : "none";
+      row.classList.toggle("is-filtered-out", !!activeFilter && status !== activeFilter);
+    });
+  }
+
+  headStatuses.forEach(head => {
+    head.addEventListener("click", () => {
+      const status = head.dataset.status;
+      activeFilter = activeFilter === status ? null : status;
+
+      headStatuses.forEach(h => {
+        const isActive = h.dataset.status === activeFilter;
+        h.classList.toggle("active", isActive);
+        h.setAttribute("aria-pressed", String(isActive));
+      });
+
+      applyFilter();
+    });
+
+    head.addEventListener("keydown", event => {
+      if (event.key === "Enter" || event.key === " ") {
+        event.preventDefault();
+        head.click();
+      }
+    });
+  });
+
   // Important: initialize state AND counters when the page opens.
   loadFromUrl();
+  applyFilter();
 })();
 </script>
 </body>
