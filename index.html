@@ -100,7 +100,7 @@
 
   .table-head, .show-row {
     display: grid;
-    grid-template-columns: 31px minmax(0, 1fr) 92px 112px 128px;
+    grid-template-columns: 31px minmax(0, 1fr) 82px 105px 128px 128px;
     column-gap: 9px;
   }
 
@@ -221,10 +221,10 @@
       padding: 20px 12px 24px;
     }
     .table-head, .show-row {
-      grid-template-columns: 25px minmax(0, 1fr) 48px 58px 67px;
+      grid-template-columns: 25px minmax(0, 1fr) 45px 55px 70px 67px;
       column-gap: 5px;
     }
-    .head-status { font-size: 8px; }
+    .head-status { font-size: 7px; }
     .counter { font-size: 20px; }
     .show-title { font-size: 13px; }
     .rank { font-size: 12px; }
@@ -244,14 +244,16 @@
   <h1>The 100 Best TV Shows of the 21st Century</h1>
   <hr class="rule">
 
-  <section class="save-panel" aria-live="polite" hidden>
+  <!--
+  <section class="save-panel" aria-live="polite">
     <div class="save-line">
       <span class="save-label">Save ID (binary)</span>
-      <code id="saveId">0 × 200 bits</code>
+      <code id="saveId">0 × 300 bits</code>
     </div>
     <div class="url" id="currentUrl"></div>
-    <div class="legend">Each show uses 2 bits: <b>00</b> = unclassified · <b>01</b> = seen · <b>10</b> = want to see · <b>11</b> = never heard of it. The ID is encoded in the URL hash, so sharing the URL reproduces the selection.</div>
+    <div class="legend">Each show uses 3 bits: <b>000</b> = unclassified · <b>001</b> = seen · <b>010</b> = want to see · <b>011</b> = don’t want to see · <b>100</b> = never heard of it. The ID is encoded in the URL hash, so sharing the URL reproduces the selection.</div>
   </section>
+  -->
 
   <div class="table-head">
     <div class="head-spacer"></div>
@@ -262,6 +264,10 @@
     <div class="head-status">
       <span class="counter" id="wantCount">0</span>
       Want to see
+    </div>
+    <div class="head-status">
+      <span class="counter" id="dontWantCount">0</span>
+      Don’t want to see
     </div>
     <div class="head-status">
       <span class="counter" id="neverCount">0</span>
@@ -282,6 +288,10 @@
           <input type="checkbox" class="status-box" data-status="want" aria-label="1. Breaking Bad — Want to see">
           <span class="box" aria-hidden="true"></span>
         </label>
+        <label class="check-cell" title="Don't want to see">
+          <input type="checkbox" class="status-box" data-status="dontwant" aria-label="1. Breaking Bad — Don't want to see">
+          <span class="box" aria-hidden="true"></span>
+        </label>
         <label class="check-cell" title="Never heard of it">
           <input type="checkbox" class="status-box" data-status="never" aria-label="1. Breaking Bad — Never heard of it">
           <span class="box" aria-hidden="true"></span>
@@ -296,6 +306,10 @@
         </label>
         <label class="check-cell" title="Want to see">
           <input type="checkbox" class="status-box" data-status="want" aria-label="2. The Wire — Want to see">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Don't want to see">
+          <input type="checkbox" class="status-box" data-status="dontwant" aria-label="2. The Wire — Don't want to see">
           <span class="box" aria-hidden="true"></span>
         </label>
         <label class="check-cell" title="Never heard of it">
@@ -314,6 +328,10 @@
           <input type="checkbox" class="status-box" data-status="want" aria-label="3. Mad Men — Want to see">
           <span class="box" aria-hidden="true"></span>
         </label>
+        <label class="check-cell" title="Don't want to see">
+          <input type="checkbox" class="status-box" data-status="dontwant" aria-label="3. Mad Men — Don't want to see">
+          <span class="box" aria-hidden="true"></span>
+        </label>
         <label class="check-cell" title="Never heard of it">
           <input type="checkbox" class="status-box" data-status="never" aria-label="3. Mad Men — Never heard of it">
           <span class="box" aria-hidden="true"></span>
@@ -328,6 +346,10 @@
         </label>
         <label class="check-cell" title="Want to see">
           <input type="checkbox" class="status-box" data-status="want" aria-label="4. Succession — Want to see">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Don't want to see">
+          <input type="checkbox" class="status-box" data-status="dontwant" aria-label="4. Succession — Don't want to see">
           <span class="box" aria-hidden="true"></span>
         </label>
         <label class="check-cell" title="Never heard of it">
@@ -346,6 +368,10 @@
           <input type="checkbox" class="status-box" data-status="want" aria-label="5. Fleabag — Want to see">
           <span class="box" aria-hidden="true"></span>
         </label>
+        <label class="check-cell" title="Don't want to see">
+          <input type="checkbox" class="status-box" data-status="dontwant" aria-label="5. Fleabag — Don't want to see">
+          <span class="box" aria-hidden="true"></span>
+        </label>
         <label class="check-cell" title="Never heard of it">
           <input type="checkbox" class="status-box" data-status="never" aria-label="5. Fleabag — Never heard of it">
           <span class="box" aria-hidden="true"></span>
@@ -360,6 +386,10 @@
         </label>
         <label class="check-cell" title="Want to see">
           <input type="checkbox" class="status-box" data-status="want" aria-label="6. Game of Thrones — Want to see">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Don't want to see">
+          <input type="checkbox" class="status-box" data-status="dontwant" aria-label="6. Game of Thrones — Don't want to see">
           <span class="box" aria-hidden="true"></span>
         </label>
         <label class="check-cell" title="Never heard of it">
@@ -378,6 +408,10 @@
           <input type="checkbox" class="status-box" data-status="want" aria-label="7. Veep — Want to see">
           <span class="box" aria-hidden="true"></span>
         </label>
+        <label class="check-cell" title="Don't want to see">
+          <input type="checkbox" class="status-box" data-status="dontwant" aria-label="7. Veep — Don't want to see">
+          <span class="box" aria-hidden="true"></span>
+        </label>
         <label class="check-cell" title="Never heard of it">
           <input type="checkbox" class="status-box" data-status="never" aria-label="7. Veep — Never heard of it">
           <span class="box" aria-hidden="true"></span>
@@ -392,6 +426,10 @@
         </label>
         <label class="check-cell" title="Want to see">
           <input type="checkbox" class="status-box" data-status="want" aria-label="8. 30 Rock — Want to see">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Don't want to see">
+          <input type="checkbox" class="status-box" data-status="dontwant" aria-label="8. 30 Rock — Don't want to see">
           <span class="box" aria-hidden="true"></span>
         </label>
         <label class="check-cell" title="Never heard of it">
@@ -410,6 +448,10 @@
           <input type="checkbox" class="status-box" data-status="want" aria-label="9. Curb Your Enthusiasm — Want to see">
           <span class="box" aria-hidden="true"></span>
         </label>
+        <label class="check-cell" title="Don't want to see">
+          <input type="checkbox" class="status-box" data-status="dontwant" aria-label="9. Curb Your Enthusiasm — Don't want to see">
+          <span class="box" aria-hidden="true"></span>
+        </label>
         <label class="check-cell" title="Never heard of it">
           <input type="checkbox" class="status-box" data-status="never" aria-label="9. Curb Your Enthusiasm — Never heard of it">
           <span class="box" aria-hidden="true"></span>
@@ -424,6 +466,10 @@
         </label>
         <label class="check-cell" title="Want to see">
           <input type="checkbox" class="status-box" data-status="want" aria-label="10. Atlanta — Want to see">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Don't want to see">
+          <input type="checkbox" class="status-box" data-status="dontwant" aria-label="10. Atlanta — Don't want to see">
           <span class="box" aria-hidden="true"></span>
         </label>
         <label class="check-cell" title="Never heard of it">
@@ -442,6 +488,10 @@
           <input type="checkbox" class="status-box" data-status="want" aria-label="11. The Office (U.S.) — Want to see">
           <span class="box" aria-hidden="true"></span>
         </label>
+        <label class="check-cell" title="Don't want to see">
+          <input type="checkbox" class="status-box" data-status="dontwant" aria-label="11. The Office (U.S.) — Don't want to see">
+          <span class="box" aria-hidden="true"></span>
+        </label>
         <label class="check-cell" title="Never heard of it">
           <input type="checkbox" class="status-box" data-status="never" aria-label="11. The Office (U.S.) — Never heard of it">
           <span class="box" aria-hidden="true"></span>
@@ -456,6 +506,10 @@
         </label>
         <label class="check-cell" title="Want to see">
           <input type="checkbox" class="status-box" data-status="want" aria-label="12. Arrested Development — Want to see">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Don't want to see">
+          <input type="checkbox" class="status-box" data-status="dontwant" aria-label="12. Arrested Development — Don't want to see">
           <span class="box" aria-hidden="true"></span>
         </label>
         <label class="check-cell" title="Never heard of it">
@@ -474,6 +528,10 @@
           <input type="checkbox" class="status-box" data-status="want" aria-label="13. Girls — Want to see">
           <span class="box" aria-hidden="true"></span>
         </label>
+        <label class="check-cell" title="Don't want to see">
+          <input type="checkbox" class="status-box" data-status="dontwant" aria-label="13. Girls — Don't want to see">
+          <span class="box" aria-hidden="true"></span>
+        </label>
         <label class="check-cell" title="Never heard of it">
           <input type="checkbox" class="status-box" data-status="never" aria-label="13. Girls — Never heard of it">
           <span class="box" aria-hidden="true"></span>
@@ -488,6 +546,10 @@
         </label>
         <label class="check-cell" title="Want to see">
           <input type="checkbox" class="status-box" data-status="want" aria-label="14. Friday Night Lights — Want to see">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Don't want to see">
+          <input type="checkbox" class="status-box" data-status="dontwant" aria-label="14. Friday Night Lights — Don't want to see">
           <span class="box" aria-hidden="true"></span>
         </label>
         <label class="check-cell" title="Never heard of it">
@@ -506,6 +568,10 @@
           <input type="checkbox" class="status-box" data-status="want" aria-label="15. Six Feet Under — Want to see">
           <span class="box" aria-hidden="true"></span>
         </label>
+        <label class="check-cell" title="Don't want to see">
+          <input type="checkbox" class="status-box" data-status="dontwant" aria-label="15. Six Feet Under — Don't want to see">
+          <span class="box" aria-hidden="true"></span>
+        </label>
         <label class="check-cell" title="Never heard of it">
           <input type="checkbox" class="status-box" data-status="never" aria-label="15. Six Feet Under — Never heard of it">
           <span class="box" aria-hidden="true"></span>
@@ -520,6 +586,10 @@
         </label>
         <label class="check-cell" title="Want to see">
           <input type="checkbox" class="status-box" data-status="want" aria-label="16. The Office (U.K.) — Want to see">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Don't want to see">
+          <input type="checkbox" class="status-box" data-status="dontwant" aria-label="16. The Office (U.K.) — Don't want to see">
           <span class="box" aria-hidden="true"></span>
         </label>
         <label class="check-cell" title="Never heard of it">
@@ -538,6 +608,10 @@
           <input type="checkbox" class="status-box" data-status="want" aria-label="17. The Americans — Want to see">
           <span class="box" aria-hidden="true"></span>
         </label>
+        <label class="check-cell" title="Don't want to see">
+          <input type="checkbox" class="status-box" data-status="dontwant" aria-label="17. The Americans — Don't want to see">
+          <span class="box" aria-hidden="true"></span>
+        </label>
         <label class="check-cell" title="Never heard of it">
           <input type="checkbox" class="status-box" data-status="never" aria-label="17. The Americans — Never heard of it">
           <span class="box" aria-hidden="true"></span>
@@ -552,6 +626,10 @@
         </label>
         <label class="check-cell" title="Want to see">
           <input type="checkbox" class="status-box" data-status="want" aria-label="18. I May Destroy You — Want to see">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Don't want to see">
+          <input type="checkbox" class="status-box" data-status="dontwant" aria-label="18. I May Destroy You — Don't want to see">
           <span class="box" aria-hidden="true"></span>
         </label>
         <label class="check-cell" title="Never heard of it">
@@ -570,6 +648,10 @@
           <input type="checkbox" class="status-box" data-status="want" aria-label="19. Chernobyl — Want to see">
           <span class="box" aria-hidden="true"></span>
         </label>
+        <label class="check-cell" title="Don't want to see">
+          <input type="checkbox" class="status-box" data-status="dontwant" aria-label="19. Chernobyl — Don't want to see">
+          <span class="box" aria-hidden="true"></span>
+        </label>
         <label class="check-cell" title="Never heard of it">
           <input type="checkbox" class="status-box" data-status="never" aria-label="19. Chernobyl — Never heard of it">
           <span class="box" aria-hidden="true"></span>
@@ -584,6 +666,10 @@
         </label>
         <label class="check-cell" title="Want to see">
           <input type="checkbox" class="status-box" data-status="want" aria-label="20. The Crown — Want to see">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Don't want to see">
+          <input type="checkbox" class="status-box" data-status="dontwant" aria-label="20. The Crown — Don't want to see">
           <span class="box" aria-hidden="true"></span>
         </label>
         <label class="check-cell" title="Never heard of it">
@@ -602,6 +688,10 @@
           <input type="checkbox" class="status-box" data-status="want" aria-label="21. The White Lotus — Want to see">
           <span class="box" aria-hidden="true"></span>
         </label>
+        <label class="check-cell" title="Don't want to see">
+          <input type="checkbox" class="status-box" data-status="dontwant" aria-label="21. The White Lotus — Don't want to see">
+          <span class="box" aria-hidden="true"></span>
+        </label>
         <label class="check-cell" title="Never heard of it">
           <input type="checkbox" class="status-box" data-status="never" aria-label="21. The White Lotus — Never heard of it">
           <span class="box" aria-hidden="true"></span>
@@ -616,6 +706,10 @@
         </label>
         <label class="check-cell" title="Want to see">
           <input type="checkbox" class="status-box" data-status="want" aria-label="22. Lost — Want to see">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Don't want to see">
+          <input type="checkbox" class="status-box" data-status="dontwant" aria-label="22. Lost — Don't want to see">
           <span class="box" aria-hidden="true"></span>
         </label>
         <label class="check-cell" title="Never heard of it">
@@ -634,6 +728,10 @@
           <input type="checkbox" class="status-box" data-status="want" aria-label="23. The Comeback — Want to see">
           <span class="box" aria-hidden="true"></span>
         </label>
+        <label class="check-cell" title="Don't want to see">
+          <input type="checkbox" class="status-box" data-status="dontwant" aria-label="23. The Comeback — Don't want to see">
+          <span class="box" aria-hidden="true"></span>
+        </label>
         <label class="check-cell" title="Never heard of it">
           <input type="checkbox" class="status-box" data-status="never" aria-label="23. The Comeback — Never heard of it">
           <span class="box" aria-hidden="true"></span>
@@ -648,6 +746,10 @@
         </label>
         <label class="check-cell" title="Want to see">
           <input type="checkbox" class="status-box" data-status="want" aria-label="24. Deadwood — Want to see">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Don't want to see">
+          <input type="checkbox" class="status-box" data-status="dontwant" aria-label="24. Deadwood — Don't want to see">
           <span class="box" aria-hidden="true"></span>
         </label>
         <label class="check-cell" title="Never heard of it">
@@ -666,6 +768,10 @@
           <input type="checkbox" class="status-box" data-status="want" aria-label="25. The Leftovers — Want to see">
           <span class="box" aria-hidden="true"></span>
         </label>
+        <label class="check-cell" title="Don't want to see">
+          <input type="checkbox" class="status-box" data-status="dontwant" aria-label="25. The Leftovers — Don't want to see">
+          <span class="box" aria-hidden="true"></span>
+        </label>
         <label class="check-cell" title="Never heard of it">
           <input type="checkbox" class="status-box" data-status="never" aria-label="25. The Leftovers — Never heard of it">
           <span class="box" aria-hidden="true"></span>
@@ -680,6 +786,10 @@
         </label>
         <label class="check-cell" title="Want to see">
           <input type="checkbox" class="status-box" data-status="want" aria-label="26. Black Mirror — Want to see">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Don't want to see">
+          <input type="checkbox" class="status-box" data-status="dontwant" aria-label="26. Black Mirror — Don't want to see">
           <span class="box" aria-hidden="true"></span>
         </label>
         <label class="check-cell" title="Never heard of it">
@@ -698,6 +808,10 @@
           <input type="checkbox" class="status-box" data-status="want" aria-label="27. Better Call Saul — Want to see">
           <span class="box" aria-hidden="true"></span>
         </label>
+        <label class="check-cell" title="Don't want to see">
+          <input type="checkbox" class="status-box" data-status="dontwant" aria-label="27. Better Call Saul — Don't want to see">
+          <span class="box" aria-hidden="true"></span>
+        </label>
         <label class="check-cell" title="Never heard of it">
           <input type="checkbox" class="status-box" data-status="never" aria-label="27. Better Call Saul — Never heard of it">
           <span class="box" aria-hidden="true"></span>
@@ -712,6 +826,10 @@
         </label>
         <label class="check-cell" title="Want to see">
           <input type="checkbox" class="status-box" data-status="want" aria-label="28. Band of Brothers — Want to see">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Don't want to see">
+          <input type="checkbox" class="status-box" data-status="dontwant" aria-label="28. Band of Brothers — Don't want to see">
           <span class="box" aria-hidden="true"></span>
         </label>
         <label class="check-cell" title="Never heard of it">
@@ -730,6 +848,10 @@
           <input type="checkbox" class="status-box" data-status="want" aria-label="29. Key &amp; Peele — Want to see">
           <span class="box" aria-hidden="true"></span>
         </label>
+        <label class="check-cell" title="Don't want to see">
+          <input type="checkbox" class="status-box" data-status="dontwant" aria-label="29. Key &amp; Peele — Don't want to see">
+          <span class="box" aria-hidden="true"></span>
+        </label>
         <label class="check-cell" title="Never heard of it">
           <input type="checkbox" class="status-box" data-status="never" aria-label="29. Key &amp; Peele — Never heard of it">
           <span class="box" aria-hidden="true"></span>
@@ -744,6 +866,10 @@
         </label>
         <label class="check-cell" title="Want to see">
           <input type="checkbox" class="status-box" data-status="want" aria-label="30. Severance — Want to see">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Don't want to see">
+          <input type="checkbox" class="status-box" data-status="dontwant" aria-label="30. Severance — Don't want to see">
           <span class="box" aria-hidden="true"></span>
         </label>
         <label class="check-cell" title="Never heard of it">
@@ -762,6 +888,10 @@
           <input type="checkbox" class="status-box" data-status="want" aria-label="31. Survivor — Want to see">
           <span class="box" aria-hidden="true"></span>
         </label>
+        <label class="check-cell" title="Don't want to see">
+          <input type="checkbox" class="status-box" data-status="dontwant" aria-label="31. Survivor — Don't want to see">
+          <span class="box" aria-hidden="true"></span>
+        </label>
         <label class="check-cell" title="Never heard of it">
           <input type="checkbox" class="status-box" data-status="never" aria-label="31. Survivor — Never heard of it">
           <span class="box" aria-hidden="true"></span>
@@ -776,6 +906,10 @@
         </label>
         <label class="check-cell" title="Want to see">
           <input type="checkbox" class="status-box" data-status="want" aria-label="32. Andor — Want to see">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Don't want to see">
+          <input type="checkbox" class="status-box" data-status="dontwant" aria-label="32. Andor — Don't want to see">
           <span class="box" aria-hidden="true"></span>
         </label>
         <label class="check-cell" title="Never heard of it">
@@ -794,6 +928,10 @@
           <input type="checkbox" class="status-box" data-status="want" aria-label="33. Enlightened — Want to see">
           <span class="box" aria-hidden="true"></span>
         </label>
+        <label class="check-cell" title="Don't want to see">
+          <input type="checkbox" class="status-box" data-status="dontwant" aria-label="33. Enlightened — Don't want to see">
+          <span class="box" aria-hidden="true"></span>
+        </label>
         <label class="check-cell" title="Never heard of it">
           <input type="checkbox" class="status-box" data-status="never" aria-label="33. Enlightened — Never heard of it">
           <span class="box" aria-hidden="true"></span>
@@ -808,6 +946,10 @@
         </label>
         <label class="check-cell" title="Want to see">
           <input type="checkbox" class="status-box" data-status="want" aria-label="34. Schitt’s Creek — Want to see">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Don't want to see">
+          <input type="checkbox" class="status-box" data-status="dontwant" aria-label="34. Schitt’s Creek — Don't want to see">
           <span class="box" aria-hidden="true"></span>
         </label>
         <label class="check-cell" title="Never heard of it">
@@ -826,6 +968,10 @@
           <input type="checkbox" class="status-box" data-status="want" aria-label="35. True Detective (Season 1) — Want to see">
           <span class="box" aria-hidden="true"></span>
         </label>
+        <label class="check-cell" title="Don't want to see">
+          <input type="checkbox" class="status-box" data-status="dontwant" aria-label="35. True Detective (Season 1) — Don't want to see">
+          <span class="box" aria-hidden="true"></span>
+        </label>
         <label class="check-cell" title="Never heard of it">
           <input type="checkbox" class="status-box" data-status="never" aria-label="35. True Detective (Season 1) — Never heard of it">
           <span class="box" aria-hidden="true"></span>
@@ -840,6 +986,10 @@
         </label>
         <label class="check-cell" title="Want to see">
           <input type="checkbox" class="status-box" data-status="want" aria-label="36. The Pitt — Want to see">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Don't want to see">
+          <input type="checkbox" class="status-box" data-status="dontwant" aria-label="36. The Pitt — Don't want to see">
           <span class="box" aria-hidden="true"></span>
         </label>
         <label class="check-cell" title="Never heard of it">
@@ -858,6 +1008,10 @@
           <input type="checkbox" class="status-box" data-status="want" aria-label="37. Battlestar Galactica — Want to see">
           <span class="box" aria-hidden="true"></span>
         </label>
+        <label class="check-cell" title="Don't want to see">
+          <input type="checkbox" class="status-box" data-status="dontwant" aria-label="37. Battlestar Galactica — Don't want to see">
+          <span class="box" aria-hidden="true"></span>
+        </label>
         <label class="check-cell" title="Never heard of it">
           <input type="checkbox" class="status-box" data-status="never" aria-label="37. Battlestar Galactica — Never heard of it">
           <span class="box" aria-hidden="true"></span>
@@ -872,6 +1026,10 @@
         </label>
         <label class="check-cell" title="Want to see">
           <input type="checkbox" class="status-box" data-status="want" aria-label="38. Homeland — Want to see">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Don't want to see">
+          <input type="checkbox" class="status-box" data-status="dontwant" aria-label="38. Homeland — Don't want to see">
           <span class="box" aria-hidden="true"></span>
         </label>
         <label class="check-cell" title="Never heard of it">
@@ -890,6 +1048,10 @@
           <input type="checkbox" class="status-box" data-status="want" aria-label="39. Watchmen — Want to see">
           <span class="box" aria-hidden="true"></span>
         </label>
+        <label class="check-cell" title="Don't want to see">
+          <input type="checkbox" class="status-box" data-status="dontwant" aria-label="39. Watchmen — Don't want to see">
+          <span class="box" aria-hidden="true"></span>
+        </label>
         <label class="check-cell" title="Never heard of it">
           <input type="checkbox" class="status-box" data-status="never" aria-label="39. Watchmen — Never heard of it">
           <span class="box" aria-hidden="true"></span>
@@ -904,6 +1066,10 @@
         </label>
         <label class="check-cell" title="Want to see">
           <input type="checkbox" class="status-box" data-status="want" aria-label="40. Adolescence — Want to see">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Don't want to see">
+          <input type="checkbox" class="status-box" data-status="dontwant" aria-label="40. Adolescence — Don't want to see">
           <span class="box" aria-hidden="true"></span>
         </label>
         <label class="check-cell" title="Never heard of it">
@@ -922,6 +1088,10 @@
           <input type="checkbox" class="status-box" data-status="want" aria-label="41. Louie — Want to see">
           <span class="box" aria-hidden="true"></span>
         </label>
+        <label class="check-cell" title="Don't want to see">
+          <input type="checkbox" class="status-box" data-status="dontwant" aria-label="41. Louie — Don't want to see">
+          <span class="box" aria-hidden="true"></span>
+        </label>
         <label class="check-cell" title="Never heard of it">
           <input type="checkbox" class="status-box" data-status="never" aria-label="41. Louie — Never heard of it">
           <span class="box" aria-hidden="true"></span>
@@ -936,6 +1106,10 @@
         </label>
         <label class="check-cell" title="Want to see">
           <input type="checkbox" class="status-box" data-status="want" aria-label="42. Hacks — Want to see">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Don't want to see">
+          <input type="checkbox" class="status-box" data-status="dontwant" aria-label="42. Hacks — Don't want to see">
           <span class="box" aria-hidden="true"></span>
         </label>
         <label class="check-cell" title="Never heard of it">
@@ -954,6 +1128,10 @@
           <input type="checkbox" class="status-box" data-status="want" aria-label="43. Peaky Blinders — Want to see">
           <span class="box" aria-hidden="true"></span>
         </label>
+        <label class="check-cell" title="Don't want to see">
+          <input type="checkbox" class="status-box" data-status="dontwant" aria-label="43. Peaky Blinders — Don't want to see">
+          <span class="box" aria-hidden="true"></span>
+        </label>
         <label class="check-cell" title="Never heard of it">
           <input type="checkbox" class="status-box" data-status="never" aria-label="43. Peaky Blinders — Never heard of it">
           <span class="box" aria-hidden="true"></span>
@@ -968,6 +1146,10 @@
         </label>
         <label class="check-cell" title="Want to see">
           <input type="checkbox" class="status-box" data-status="want" aria-label="44. BoJack Horseman — Want to see">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Don't want to see">
+          <input type="checkbox" class="status-box" data-status="dontwant" aria-label="44. BoJack Horseman — Don't want to see">
           <span class="box" aria-hidden="true"></span>
         </label>
         <label class="check-cell" title="Never heard of it">
@@ -986,6 +1168,10 @@
           <input type="checkbox" class="status-box" data-status="want" aria-label="45. Happy Valley — Want to see">
           <span class="box" aria-hidden="true"></span>
         </label>
+        <label class="check-cell" title="Don't want to see">
+          <input type="checkbox" class="status-box" data-status="dontwant" aria-label="45. Happy Valley — Don't want to see">
+          <span class="box" aria-hidden="true"></span>
+        </label>
         <label class="check-cell" title="Never heard of it">
           <input type="checkbox" class="status-box" data-status="never" aria-label="45. Happy Valley — Never heard of it">
           <span class="box" aria-hidden="true"></span>
@@ -1000,6 +1186,10 @@
         </label>
         <label class="check-cell" title="Want to see">
           <input type="checkbox" class="status-box" data-status="want" aria-label="46. Broad City — Want to see">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Don't want to see">
+          <input type="checkbox" class="status-box" data-status="dontwant" aria-label="46. Broad City — Don't want to see">
           <span class="box" aria-hidden="true"></span>
         </label>
         <label class="check-cell" title="Never heard of it">
@@ -1018,6 +1208,10 @@
           <input type="checkbox" class="status-box" data-status="want" aria-label="47. Twin Peaks: The Return — Want to see">
           <span class="box" aria-hidden="true"></span>
         </label>
+        <label class="check-cell" title="Don't want to see">
+          <input type="checkbox" class="status-box" data-status="dontwant" aria-label="47. Twin Peaks: The Return — Don't want to see">
+          <span class="box" aria-hidden="true"></span>
+        </label>
         <label class="check-cell" title="Never heard of it">
           <input type="checkbox" class="status-box" data-status="never" aria-label="47. Twin Peaks: The Return — Never heard of it">
           <span class="box" aria-hidden="true"></span>
@@ -1032,6 +1226,10 @@
         </label>
         <label class="check-cell" title="Want to see">
           <input type="checkbox" class="status-box" data-status="want" aria-label="48. House of Cards — Want to see">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Don't want to see">
+          <input type="checkbox" class="status-box" data-status="dontwant" aria-label="48. House of Cards — Don't want to see">
           <span class="box" aria-hidden="true"></span>
         </label>
         <label class="check-cell" title="Never heard of it">
@@ -1050,6 +1248,10 @@
           <input type="checkbox" class="status-box" data-status="want" aria-label="49. Normal People — Want to see">
           <span class="box" aria-hidden="true"></span>
         </label>
+        <label class="check-cell" title="Don't want to see">
+          <input type="checkbox" class="status-box" data-status="dontwant" aria-label="49. Normal People — Don't want to see">
+          <span class="box" aria-hidden="true"></span>
+        </label>
         <label class="check-cell" title="Never heard of it">
           <input type="checkbox" class="status-box" data-status="never" aria-label="49. Normal People — Never heard of it">
           <span class="box" aria-hidden="true"></span>
@@ -1064,6 +1266,10 @@
         </label>
         <label class="check-cell" title="Want to see">
           <input type="checkbox" class="status-box" data-status="want" aria-label="50. Parks and Recreation — Want to see">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Don't want to see">
+          <input type="checkbox" class="status-box" data-status="dontwant" aria-label="50. Parks and Recreation — Don't want to see">
           <span class="box" aria-hidden="true"></span>
         </label>
         <label class="check-cell" title="Never heard of it">
@@ -1082,6 +1288,10 @@
           <input type="checkbox" class="status-box" data-status="want" aria-label="51. The Good Place — Want to see">
           <span class="box" aria-hidden="true"></span>
         </label>
+        <label class="check-cell" title="Don't want to see">
+          <input type="checkbox" class="status-box" data-status="dontwant" aria-label="51. The Good Place — Don't want to see">
+          <span class="box" aria-hidden="true"></span>
+        </label>
         <label class="check-cell" title="Never heard of it">
           <input type="checkbox" class="status-box" data-status="never" aria-label="51. The Good Place — Never heard of it">
           <span class="box" aria-hidden="true"></span>
@@ -1096,6 +1306,10 @@
         </label>
         <label class="check-cell" title="Want to see">
           <input type="checkbox" class="status-box" data-status="want" aria-label="52. Downton Abbey — Want to see">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Don't want to see">
+          <input type="checkbox" class="status-box" data-status="dontwant" aria-label="52. Downton Abbey — Don't want to see">
           <span class="box" aria-hidden="true"></span>
         </label>
         <label class="check-cell" title="Never heard of it">
@@ -1114,6 +1328,10 @@
           <input type="checkbox" class="status-box" data-status="want" aria-label="53. Stranger Things — Want to see">
           <span class="box" aria-hidden="true"></span>
         </label>
+        <label class="check-cell" title="Don't want to see">
+          <input type="checkbox" class="status-box" data-status="dontwant" aria-label="53. Stranger Things — Don't want to see">
+          <span class="box" aria-hidden="true"></span>
+        </label>
         <label class="check-cell" title="Never heard of it">
           <input type="checkbox" class="status-box" data-status="never" aria-label="53. Stranger Things — Never heard of it">
           <span class="box" aria-hidden="true"></span>
@@ -1128,6 +1346,10 @@
         </label>
         <label class="check-cell" title="Want to see">
           <input type="checkbox" class="status-box" data-status="want" aria-label="54. The Bureau — Want to see">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Don't want to see">
+          <input type="checkbox" class="status-box" data-status="dontwant" aria-label="54. The Bureau — Don't want to see">
           <span class="box" aria-hidden="true"></span>
         </label>
         <label class="check-cell" title="Never heard of it">
@@ -1146,6 +1368,10 @@
           <input type="checkbox" class="status-box" data-status="want" aria-label="55. Insecure — Want to see">
           <span class="box" aria-hidden="true"></span>
         </label>
+        <label class="check-cell" title="Don't want to see">
+          <input type="checkbox" class="status-box" data-status="dontwant" aria-label="55. Insecure — Don't want to see">
+          <span class="box" aria-hidden="true"></span>
+        </label>
         <label class="check-cell" title="Never heard of it">
           <input type="checkbox" class="status-box" data-status="never" aria-label="55. Insecure — Never heard of it">
           <span class="box" aria-hidden="true"></span>
@@ -1160,6 +1386,10 @@
         </label>
         <label class="check-cell" title="Want to see">
           <input type="checkbox" class="status-box" data-status="want" aria-label="56. Nathan for You — Want to see">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Don't want to see">
+          <input type="checkbox" class="status-box" data-status="dontwant" aria-label="56. Nathan for You — Don't want to see">
           <span class="box" aria-hidden="true"></span>
         </label>
         <label class="check-cell" title="Never heard of it">
@@ -1178,6 +1408,10 @@
           <input type="checkbox" class="status-box" data-status="want" aria-label="57. I Think You Should Leave — Want to see">
           <span class="box" aria-hidden="true"></span>
         </label>
+        <label class="check-cell" title="Don't want to see">
+          <input type="checkbox" class="status-box" data-status="dontwant" aria-label="57. I Think You Should Leave — Don't want to see">
+          <span class="box" aria-hidden="true"></span>
+        </label>
         <label class="check-cell" title="Never heard of it">
           <input type="checkbox" class="status-box" data-status="never" aria-label="57. I Think You Should Leave — Never heard of it">
           <span class="box" aria-hidden="true"></span>
@@ -1192,6 +1426,10 @@
         </label>
         <label class="check-cell" title="Want to see">
           <input type="checkbox" class="status-box" data-status="want" aria-label="58. Chappelle’s Show — Want to see">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Don't want to see">
+          <input type="checkbox" class="status-box" data-status="dontwant" aria-label="58. Chappelle’s Show — Don't want to see">
           <span class="box" aria-hidden="true"></span>
         </label>
         <label class="check-cell" title="Never heard of it">
@@ -1210,6 +1448,10 @@
           <input type="checkbox" class="status-box" data-status="want" aria-label="59. PEN15 — Want to see">
           <span class="box" aria-hidden="true"></span>
         </label>
+        <label class="check-cell" title="Don't want to see">
+          <input type="checkbox" class="status-box" data-status="dontwant" aria-label="59. PEN15 — Don't want to see">
+          <span class="box" aria-hidden="true"></span>
+        </label>
         <label class="check-cell" title="Never heard of it">
           <input type="checkbox" class="status-box" data-status="never" aria-label="59. PEN15 — Never heard of it">
           <span class="box" aria-hidden="true"></span>
@@ -1224,6 +1466,10 @@
         </label>
         <label class="check-cell" title="Want to see">
           <input type="checkbox" class="status-box" data-status="want" aria-label="60. Peep Show — Want to see">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Don't want to see">
+          <input type="checkbox" class="status-box" data-status="dontwant" aria-label="60. Peep Show — Don't want to see">
           <span class="box" aria-hidden="true"></span>
         </label>
         <label class="check-cell" title="Never heard of it">
@@ -1242,6 +1488,10 @@
           <input type="checkbox" class="status-box" data-status="want" aria-label="61. RuPaul’s Drag Race — Want to see">
           <span class="box" aria-hidden="true"></span>
         </label>
+        <label class="check-cell" title="Don't want to see">
+          <input type="checkbox" class="status-box" data-status="dontwant" aria-label="61. RuPaul’s Drag Race — Don't want to see">
+          <span class="box" aria-hidden="true"></span>
+        </label>
         <label class="check-cell" title="Never heard of it">
           <input type="checkbox" class="status-box" data-status="never" aria-label="61. RuPaul’s Drag Race — Never heard of it">
           <span class="box" aria-hidden="true"></span>
@@ -1256,6 +1506,10 @@
         </label>
         <label class="check-cell" title="Want to see">
           <input type="checkbox" class="status-box" data-status="want" aria-label="62. Slow Horses — Want to see">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Don't want to see">
+          <input type="checkbox" class="status-box" data-status="dontwant" aria-label="62. Slow Horses — Don't want to see">
           <span class="box" aria-hidden="true"></span>
         </label>
         <label class="check-cell" title="Never heard of it">
@@ -1274,6 +1528,10 @@
           <input type="checkbox" class="status-box" data-status="want" aria-label="63. The Thick of It — Want to see">
           <span class="box" aria-hidden="true"></span>
         </label>
+        <label class="check-cell" title="Don't want to see">
+          <input type="checkbox" class="status-box" data-status="dontwant" aria-label="63. The Thick of It — Don't want to see">
+          <span class="box" aria-hidden="true"></span>
+        </label>
         <label class="check-cell" title="Never heard of it">
           <input type="checkbox" class="status-box" data-status="never" aria-label="63. The Thick of It — Never heard of it">
           <span class="box" aria-hidden="true"></span>
@@ -1288,6 +1546,10 @@
         </label>
         <label class="check-cell" title="Want to see">
           <input type="checkbox" class="status-box" data-status="want" aria-label="64. Anthony Bourdain: Parts Unknown — Want to see">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Don't want to see">
+          <input type="checkbox" class="status-box" data-status="dontwant" aria-label="64. Anthony Bourdain: Parts Unknown — Don't want to see">
           <span class="box" aria-hidden="true"></span>
         </label>
         <label class="check-cell" title="Never heard of it">
@@ -1306,6 +1568,10 @@
           <input type="checkbox" class="status-box" data-status="want" aria-label="65. Mare of Easttown — Want to see">
           <span class="box" aria-hidden="true"></span>
         </label>
+        <label class="check-cell" title="Don't want to see">
+          <input type="checkbox" class="status-box" data-status="dontwant" aria-label="65. Mare of Easttown — Don't want to see">
+          <span class="box" aria-hidden="true"></span>
+        </label>
         <label class="check-cell" title="Never heard of it">
           <input type="checkbox" class="status-box" data-status="never" aria-label="65. Mare of Easttown — Never heard of it">
           <span class="box" aria-hidden="true"></span>
@@ -1320,6 +1586,10 @@
         </label>
         <label class="check-cell" title="Want to see">
           <input type="checkbox" class="status-box" data-status="want" aria-label="66. The Rehearsal — Want to see">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Don't want to see">
+          <input type="checkbox" class="status-box" data-status="dontwant" aria-label="66. The Rehearsal — Don't want to see">
           <span class="box" aria-hidden="true"></span>
         </label>
         <label class="check-cell" title="Never heard of it">
@@ -1338,6 +1608,10 @@
           <input type="checkbox" class="status-box" data-status="want" aria-label="67. The Handmaid’s Tale — Want to see">
           <span class="box" aria-hidden="true"></span>
         </label>
+        <label class="check-cell" title="Don't want to see">
+          <input type="checkbox" class="status-box" data-status="dontwant" aria-label="67. The Handmaid’s Tale — Don't want to see">
+          <span class="box" aria-hidden="true"></span>
+        </label>
         <label class="check-cell" title="Never heard of it">
           <input type="checkbox" class="status-box" data-status="never" aria-label="67. The Handmaid’s Tale — Never heard of it">
           <span class="box" aria-hidden="true"></span>
@@ -1352,6 +1626,10 @@
         </label>
         <label class="check-cell" title="Want to see">
           <input type="checkbox" class="status-box" data-status="want" aria-label="68. Ozark — Want to see">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Don't want to see">
+          <input type="checkbox" class="status-box" data-status="dontwant" aria-label="68. Ozark — Don't want to see">
           <span class="box" aria-hidden="true"></span>
         </label>
         <label class="check-cell" title="Never heard of it">
@@ -1370,6 +1648,10 @@
           <input type="checkbox" class="status-box" data-status="want" aria-label="69. Anthony Bourdain: No Reservations — Want to see">
           <span class="box" aria-hidden="true"></span>
         </label>
+        <label class="check-cell" title="Don't want to see">
+          <input type="checkbox" class="status-box" data-status="dontwant" aria-label="69. Anthony Bourdain: No Reservations — Don't want to see">
+          <span class="box" aria-hidden="true"></span>
+        </label>
         <label class="check-cell" title="Never heard of it">
           <input type="checkbox" class="status-box" data-status="never" aria-label="69. Anthony Bourdain: No Reservations — Never heard of it">
           <span class="box" aria-hidden="true"></span>
@@ -1384,6 +1666,10 @@
         </label>
         <label class="check-cell" title="Want to see">
           <input type="checkbox" class="status-box" data-status="want" aria-label="70. The Shield — Want to see">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Don't want to see">
+          <input type="checkbox" class="status-box" data-status="dontwant" aria-label="70. The Shield — Don't want to see">
           <span class="box" aria-hidden="true"></span>
         </label>
         <label class="check-cell" title="Never heard of it">
@@ -1402,6 +1688,10 @@
           <input type="checkbox" class="status-box" data-status="want" aria-label="71. Beef (Season 1) — Want to see">
           <span class="box" aria-hidden="true"></span>
         </label>
+        <label class="check-cell" title="Don't want to see">
+          <input type="checkbox" class="status-box" data-status="dontwant" aria-label="71. Beef (Season 1) — Don't want to see">
+          <span class="box" aria-hidden="true"></span>
+        </label>
         <label class="check-cell" title="Never heard of it">
           <input type="checkbox" class="status-box" data-status="never" aria-label="71. Beef (Season 1) — Never heard of it">
           <span class="box" aria-hidden="true"></span>
@@ -1416,6 +1706,10 @@
         </label>
         <label class="check-cell" title="Want to see">
           <input type="checkbox" class="status-box" data-status="want" aria-label="72. Squid Game — Want to see">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Don't want to see">
+          <input type="checkbox" class="status-box" data-status="dontwant" aria-label="72. Squid Game — Don't want to see">
           <span class="box" aria-hidden="true"></span>
         </label>
         <label class="check-cell" title="Never heard of it">
@@ -1434,6 +1728,10 @@
           <input type="checkbox" class="status-box" data-status="want" aria-label="73. Barry — Want to see">
           <span class="box" aria-hidden="true"></span>
         </label>
+        <label class="check-cell" title="Don't want to see">
+          <input type="checkbox" class="status-box" data-status="dontwant" aria-label="73. Barry — Don't want to see">
+          <span class="box" aria-hidden="true"></span>
+        </label>
         <label class="check-cell" title="Never heard of it">
           <input type="checkbox" class="status-box" data-status="never" aria-label="73. Barry — Never heard of it">
           <span class="box" aria-hidden="true"></span>
@@ -1448,6 +1746,10 @@
         </label>
         <label class="check-cell" title="Want to see">
           <input type="checkbox" class="status-box" data-status="want" aria-label="74. The Bear — Want to see">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Don't want to see">
+          <input type="checkbox" class="status-box" data-status="dontwant" aria-label="74. The Bear — Don't want to see">
           <span class="box" aria-hidden="true"></span>
         </label>
         <label class="check-cell" title="Never heard of it">
@@ -1466,6 +1768,10 @@
           <input type="checkbox" class="status-box" data-status="want" aria-label="75. Ted Lasso — Want to see">
           <span class="box" aria-hidden="true"></span>
         </label>
+        <label class="check-cell" title="Don't want to see">
+          <input type="checkbox" class="status-box" data-status="dontwant" aria-label="75. Ted Lasso — Don't want to see">
+          <span class="box" aria-hidden="true"></span>
+        </label>
         <label class="check-cell" title="Never heard of it">
           <input type="checkbox" class="status-box" data-status="never" aria-label="75. Ted Lasso — Never heard of it">
           <span class="box" aria-hidden="true"></span>
@@ -1480,6 +1786,10 @@
         </label>
         <label class="check-cell" title="Want to see">
           <input type="checkbox" class="status-box" data-status="want" aria-label="76. Somebody Somewhere — Want to see">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Don't want to see">
+          <input type="checkbox" class="status-box" data-status="dontwant" aria-label="76. Somebody Somewhere — Don't want to see">
           <span class="box" aria-hidden="true"></span>
         </label>
         <label class="check-cell" title="Never heard of it">
@@ -1498,6 +1808,10 @@
           <input type="checkbox" class="status-box" data-status="want" aria-label="77. Modern Family — Want to see">
           <span class="box" aria-hidden="true"></span>
         </label>
+        <label class="check-cell" title="Don't want to see">
+          <input type="checkbox" class="status-box" data-status="dontwant" aria-label="77. Modern Family — Don't want to see">
+          <span class="box" aria-hidden="true"></span>
+        </label>
         <label class="check-cell" title="Never heard of it">
           <input type="checkbox" class="status-box" data-status="never" aria-label="77. Modern Family — Never heard of it">
           <span class="box" aria-hidden="true"></span>
@@ -1512,6 +1826,10 @@
         </label>
         <label class="check-cell" title="Want to see">
           <input type="checkbox" class="status-box" data-status="want" aria-label="78. It’s Always Sunny in Philadelphia — Want to see">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Don't want to see">
+          <input type="checkbox" class="status-box" data-status="dontwant" aria-label="78. It’s Always Sunny in Philadelphia — Don't want to see">
           <span class="box" aria-hidden="true"></span>
         </label>
         <label class="check-cell" title="Never heard of it">
@@ -1530,6 +1848,10 @@
           <input type="checkbox" class="status-box" data-status="want" aria-label="79. The Good Wife — Want to see">
           <span class="box" aria-hidden="true"></span>
         </label>
+        <label class="check-cell" title="Don't want to see">
+          <input type="checkbox" class="status-box" data-status="dontwant" aria-label="79. The Good Wife — Don't want to see">
+          <span class="box" aria-hidden="true"></span>
+        </label>
         <label class="check-cell" title="Never heard of it">
           <input type="checkbox" class="status-box" data-status="never" aria-label="79. The Good Wife — Never heard of it">
           <span class="box" aria-hidden="true"></span>
@@ -1544,6 +1866,10 @@
         </label>
         <label class="check-cell" title="Want to see">
           <input type="checkbox" class="status-box" data-status="want" aria-label="80. How To With John Wilson — Want to see">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Don't want to see">
+          <input type="checkbox" class="status-box" data-status="dontwant" aria-label="80. How To With John Wilson — Don't want to see">
           <span class="box" aria-hidden="true"></span>
         </label>
         <label class="check-cell" title="Never heard of it">
@@ -1562,6 +1888,10 @@
           <input type="checkbox" class="status-box" data-status="want" aria-label="81. The Queen’s Gambit — Want to see">
           <span class="box" aria-hidden="true"></span>
         </label>
+        <label class="check-cell" title="Don't want to see">
+          <input type="checkbox" class="status-box" data-status="dontwant" aria-label="81. The Queen’s Gambit — Don't want to see">
+          <span class="box" aria-hidden="true"></span>
+        </label>
         <label class="check-cell" title="Never heard of it">
           <input type="checkbox" class="status-box" data-status="never" aria-label="81. The Queen’s Gambit — Never heard of it">
           <span class="box" aria-hidden="true"></span>
@@ -1576,6 +1906,10 @@
         </label>
         <label class="check-cell" title="Want to see">
           <input type="checkbox" class="status-box" data-status="want" aria-label="82. Better Things — Want to see">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Don't want to see">
+          <input type="checkbox" class="status-box" data-status="dontwant" aria-label="82. Better Things — Don't want to see">
           <span class="box" aria-hidden="true"></span>
         </label>
         <label class="check-cell" title="Never heard of it">
@@ -1594,6 +1928,10 @@
           <input type="checkbox" class="status-box" data-status="want" aria-label="83. Justified — Want to see">
           <span class="box" aria-hidden="true"></span>
         </label>
+        <label class="check-cell" title="Don't want to see">
+          <input type="checkbox" class="status-box" data-status="dontwant" aria-label="83. Justified — Don't want to see">
+          <span class="box" aria-hidden="true"></span>
+        </label>
         <label class="check-cell" title="Never heard of it">
           <input type="checkbox" class="status-box" data-status="never" aria-label="83. Justified — Never heard of it">
           <span class="box" aria-hidden="true"></span>
@@ -1608,6 +1946,10 @@
         </label>
         <label class="check-cell" title="Want to see">
           <input type="checkbox" class="status-box" data-status="want" aria-label="84. Planet Earth — Want to see">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Don't want to see">
+          <input type="checkbox" class="status-box" data-status="dontwant" aria-label="84. Planet Earth — Don't want to see">
           <span class="box" aria-hidden="true"></span>
         </label>
         <label class="check-cell" title="Never heard of it">
@@ -1626,6 +1968,10 @@
           <input type="checkbox" class="status-box" data-status="want" aria-label="85. The Great British Baking Show — Want to see">
           <span class="box" aria-hidden="true"></span>
         </label>
+        <label class="check-cell" title="Don't want to see">
+          <input type="checkbox" class="status-box" data-status="dontwant" aria-label="85. The Great British Baking Show — Don't want to see">
+          <span class="box" aria-hidden="true"></span>
+        </label>
         <label class="check-cell" title="Never heard of it">
           <input type="checkbox" class="status-box" data-status="never" aria-label="85. The Great British Baking Show — Never heard of it">
           <span class="box" aria-hidden="true"></span>
@@ -1640,6 +1986,10 @@
         </label>
         <label class="check-cell" title="Want to see">
           <input type="checkbox" class="status-box" data-status="want" aria-label="86. Shogun — Want to see">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Don't want to see">
+          <input type="checkbox" class="status-box" data-status="dontwant" aria-label="86. Shogun — Don't want to see">
           <span class="box" aria-hidden="true"></span>
         </label>
         <label class="check-cell" title="Never heard of it">
@@ -1658,6 +2008,10 @@
           <input type="checkbox" class="status-box" data-status="want" aria-label="87. Reservation Dogs — Want to see">
           <span class="box" aria-hidden="true"></span>
         </label>
+        <label class="check-cell" title="Don't want to see">
+          <input type="checkbox" class="status-box" data-status="dontwant" aria-label="87. Reservation Dogs — Don't want to see">
+          <span class="box" aria-hidden="true"></span>
+        </label>
         <label class="check-cell" title="Never heard of it">
           <input type="checkbox" class="status-box" data-status="never" aria-label="87. Reservation Dogs — Never heard of it">
           <span class="box" aria-hidden="true"></span>
@@ -1672,6 +2026,10 @@
         </label>
         <label class="check-cell" title="Want to see">
           <input type="checkbox" class="status-box" data-status="want" aria-label="88. Dexter — Want to see">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Don't want to see">
+          <input type="checkbox" class="status-box" data-status="dontwant" aria-label="88. Dexter — Don't want to see">
           <span class="box" aria-hidden="true"></span>
         </label>
         <label class="check-cell" title="Never heard of it">
@@ -1690,6 +2048,10 @@
           <input type="checkbox" class="status-box" data-status="want" aria-label="89. Baby Reindeer — Want to see">
           <span class="box" aria-hidden="true"></span>
         </label>
+        <label class="check-cell" title="Don't want to see">
+          <input type="checkbox" class="status-box" data-status="dontwant" aria-label="89. Baby Reindeer — Don't want to see">
+          <span class="box" aria-hidden="true"></span>
+        </label>
         <label class="check-cell" title="Never heard of it">
           <input type="checkbox" class="status-box" data-status="never" aria-label="89. Baby Reindeer — Never heard of it">
           <span class="box" aria-hidden="true"></span>
@@ -1704,6 +2066,10 @@
         </label>
         <label class="check-cell" title="Want to see">
           <input type="checkbox" class="status-box" data-status="want" aria-label="90. Eastbound &amp; Down — Want to see">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Don't want to see">
+          <input type="checkbox" class="status-box" data-status="dontwant" aria-label="90. Eastbound &amp; Down — Don't want to see">
           <span class="box" aria-hidden="true"></span>
         </label>
         <label class="check-cell" title="Never heard of it">
@@ -1722,6 +2088,10 @@
           <input type="checkbox" class="status-box" data-status="want" aria-label="91. Catastrophe — Want to see">
           <span class="box" aria-hidden="true"></span>
         </label>
+        <label class="check-cell" title="Don't want to see">
+          <input type="checkbox" class="status-box" data-status="dontwant" aria-label="91. Catastrophe — Don't want to see">
+          <span class="box" aria-hidden="true"></span>
+        </label>
         <label class="check-cell" title="Never heard of it">
           <input type="checkbox" class="status-box" data-status="never" aria-label="91. Catastrophe — Never heard of it">
           <span class="box" aria-hidden="true"></span>
@@ -1736,6 +2106,10 @@
         </label>
         <label class="check-cell" title="Want to see">
           <input type="checkbox" class="status-box" data-status="want" aria-label="92. The Night Of — Want to see">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Don't want to see">
+          <input type="checkbox" class="status-box" data-status="dontwant" aria-label="92. The Night Of — Don't want to see">
           <span class="box" aria-hidden="true"></span>
         </label>
         <label class="check-cell" title="Never heard of it">
@@ -1754,6 +2128,10 @@
           <input type="checkbox" class="status-box" data-status="want" aria-label="93. Station Eleven — Want to see">
           <span class="box" aria-hidden="true"></span>
         </label>
+        <label class="check-cell" title="Don't want to see">
+          <input type="checkbox" class="status-box" data-status="dontwant" aria-label="93. Station Eleven — Don't want to see">
+          <span class="box" aria-hidden="true"></span>
+        </label>
         <label class="check-cell" title="Never heard of it">
           <input type="checkbox" class="status-box" data-status="never" aria-label="93. Station Eleven — Never heard of it">
           <span class="box" aria-hidden="true"></span>
@@ -1768,6 +2146,10 @@
         </label>
         <label class="check-cell" title="Want to see">
           <input type="checkbox" class="status-box" data-status="want" aria-label="94. The Diplomat — Want to see">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Don't want to see">
+          <input type="checkbox" class="status-box" data-status="dontwant" aria-label="94. The Diplomat — Don't want to see">
           <span class="box" aria-hidden="true"></span>
         </label>
         <label class="check-cell" title="Never heard of it">
@@ -1786,6 +2168,10 @@
           <input type="checkbox" class="status-box" data-status="want" aria-label="95. House — Want to see">
           <span class="box" aria-hidden="true"></span>
         </label>
+        <label class="check-cell" title="Don't want to see">
+          <input type="checkbox" class="status-box" data-status="dontwant" aria-label="95. House — Don't want to see">
+          <span class="box" aria-hidden="true"></span>
+        </label>
         <label class="check-cell" title="Never heard of it">
           <input type="checkbox" class="status-box" data-status="never" aria-label="95. House — Never heard of it">
           <span class="box" aria-hidden="true"></span>
@@ -1800,6 +2186,10 @@
         </label>
         <label class="check-cell" title="Want to see">
           <input type="checkbox" class="status-box" data-status="want" aria-label="96. Halt and Catch Fire — Want to see">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Don't want to see">
+          <input type="checkbox" class="status-box" data-status="dontwant" aria-label="96. Halt and Catch Fire — Don't want to see">
           <span class="box" aria-hidden="true"></span>
         </label>
         <label class="check-cell" title="Never heard of it">
@@ -1818,6 +2208,10 @@
           <input type="checkbox" class="status-box" data-status="want" aria-label="97. Community — Want to see">
           <span class="box" aria-hidden="true"></span>
         </label>
+        <label class="check-cell" title="Don't want to see">
+          <input type="checkbox" class="status-box" data-status="dontwant" aria-label="97. Community — Don't want to see">
+          <span class="box" aria-hidden="true"></span>
+        </label>
         <label class="check-cell" title="Never heard of it">
           <input type="checkbox" class="status-box" data-status="never" aria-label="97. Community — Never heard of it">
           <span class="box" aria-hidden="true"></span>
@@ -1832,6 +2226,10 @@
         </label>
         <label class="check-cell" title="Want to see">
           <input type="checkbox" class="status-box" data-status="want" aria-label="98. The OA — Want to see">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Don't want to see">
+          <input type="checkbox" class="status-box" data-status="dontwant" aria-label="98. The OA — Don't want to see">
           <span class="box" aria-hidden="true"></span>
         </label>
         <label class="check-cell" title="Never heard of it">
@@ -1850,6 +2248,10 @@
           <input type="checkbox" class="status-box" data-status="want" aria-label="99. Gilmore Girls — Want to see">
           <span class="box" aria-hidden="true"></span>
         </label>
+        <label class="check-cell" title="Don't want to see">
+          <input type="checkbox" class="status-box" data-status="dontwant" aria-label="99. Gilmore Girls — Don't want to see">
+          <span class="box" aria-hidden="true"></span>
+        </label>
         <label class="check-cell" title="Never heard of it">
           <input type="checkbox" class="status-box" data-status="never" aria-label="99. Gilmore Girls — Never heard of it">
           <span class="box" aria-hidden="true"></span>
@@ -1864,6 +2266,10 @@
         </label>
         <label class="check-cell" title="Want to see">
           <input type="checkbox" class="status-box" data-status="want" aria-label="100. Scandal — Want to see">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Don't want to see">
+          <input type="checkbox" class="status-box" data-status="dontwant" aria-label="100. Scandal — Don't want to see">
           <span class="box" aria-hidden="true"></span>
         </label>
         <label class="check-cell" title="Never heard of it">
@@ -1887,12 +2293,25 @@
   const counters = {
     seen: document.getElementById("seenCount"),
     want: document.getElementById("wantCount"),
+    dontwant: document.getElementById("dontWantCount"),
     never: document.getElementById("neverCount")
   };
 
-  // Two bits per show. 00 is intentionally reserved for "unclassified".
-  const CODE = { none: "00", seen: "01", want: "10", never: "11" };
-  const STATUS_BY_CODE = { "00": "none", "01": "seen", "10": "want", "11": "never" };
+  // Three bits per show. 101–111 are reserved for future states.
+  const CODE = {
+    none: "000",
+    seen: "001",
+    want: "010",
+    dontwant: "011",
+    never: "100"
+  };
+  const STATUS_BY_CODE = {
+    "000": "none",
+    "001": "seen",
+    "010": "want",
+    "011": "dontwant",
+    "100": "never"
+  };
 
   function getState() {
     return rows.map(row => {
@@ -1906,12 +2325,35 @@
   }
 
   function binaryToState(binary) {
-    if (!/^[01]+$/.test(binary) || binary.length !== rows.length * 2) return null;
-    const state = [];
-    for (let i = 0; i < binary.length; i += 2) {
-      state.push(STATUS_BY_CODE[binary.slice(i, i + 2)]);
+    if (!/^[01]+$/.test(binary)) return null;
+
+    // Current format: 3 bits/show.
+    if (binary.length === rows.length * 3) {
+      const state = [];
+      for (let i = 0; i < binary.length; i += 3) {
+        const status = STATUS_BY_CODE[binary.slice(i, i + 3)];
+        if (!status) return null;
+        state.push(status);
+      }
+      return state;
     }
-    return state;
+
+    // Backward compatibility with the original 2-bit URLs.
+    if (binary.length === rows.length * 2) {
+      const oldMap = {
+        "00": "none",
+        "01": "seen",
+        "10": "want",
+        "11": "never"
+      };
+      const state = [];
+      for (let i = 0; i < binary.length; i += 2) {
+        state.push(oldMap[binary.slice(i, i + 2)]);
+      }
+      return state;
+    }
+
+    return null;
   }
 
   function applyState(state) {
@@ -1922,6 +2364,7 @@
       });
       row.classList.toggle("is-seen", status === "seen");
       row.classList.toggle("is-want", status === "want");
+      row.classList.toggle("is-dontwant", status === "dontwant");
       row.classList.toggle("is-never", status === "never");
     });
   }
@@ -1938,7 +2381,7 @@
 
     // Hash is deliberately used instead of query parameters so GitHub Pages
     // can serve the same static index.html for every save ID.
-    const newUrl = window.location.pathname + window.location.search + "#s=" + binary;
+    const newUrl = window.location.pathname + window.location.search + "#v2=" + binary;
     window.history.replaceState(null, "", newUrl);
 
     saveIdEl.textContent = binary;
@@ -1947,7 +2390,7 @@
   }
 
   function loadFromUrl() {
-    const match = window.location.hash.match(/^#s=([01]+)$/i);
+    const match = window.location.hash.match(/^#(?:v2|s)=([01]+)$/i);
     const decoded = match ? binaryToState(match[1]) : null;
 
     if (decoded) {
