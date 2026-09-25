@@ -252,8 +252,8 @@
     </div>
     <div class="url" id="currentUrl"></div>
     <div class="legend">Each show uses 3 bits: <b>000</b> = unclassified · <b>001</b> = seen · <b>010</b> = want to see · <b>011</b> = don’t want to see · <b>100</b> = never heard of it. The ID is encoded in the URL hash, so sharing the URL reproduces the selection.</div>
-  </section>
-  -->
+</section>
+   -->
 
   <div class="table-head">
     <div class="head-spacer"></div>
@@ -2288,8 +2288,10 @@
 (() => {
   const rows = [...document.querySelectorAll(".show-row")];
   const boxes = [...document.querySelectorAll(".status-box")];
+
   const saveIdEl = document.getElementById("saveId");
   const currentUrlEl = document.getElementById("currentUrl");
+
   const counters = {
     seen: document.getElementById("seenCount"),
     want: document.getElementById("wantCount"),
@@ -2297,7 +2299,12 @@
     never: document.getElementById("neverCount")
   };
 
-  // Three bits per show. 101–111 are reserved for future states.
+  // Current format: 3 bits per show.
+  // 000 = unclassified
+  // 001 = seen
+  // 010 = want to see
+  // 011 = don't want to see
+  // 100 = never heard of it
   const CODE = {
     none: "000",
     seen: "001",
@@ -2305,6 +2312,7 @@
     dontwant: "011",
     never: "100"
   };
+
   const STATUS_BY_CODE = {
     "000": "none",
     "001": "seen",
@@ -2321,24 +2329,30 @@
   }
 
   function stateToBinary(state) {
-    return state.map(status => CODE[status]).join("");
+    return state.map(status => CODE[status] || CODE.none).join("");
   }
 
   function binaryToState(binary) {
     if (!/^[01]+$/.test(binary)) return null;
 
-    // Current format: 3 bits/show.
+    // Current 3-bit format.
     if (binary.length === rows.length * 3) {
       const state = [];
+
       for (let i = 0; i < binary.length; i += 3) {
-        const status = STATUS_BY_CODE[binary.slice(i, i + 3)];
+        const code = binary.slice(i, i + 3);
+        const status = STATUS_BY_CODE[code];
+
+        // 101, 110 and 111 are reserved/invalid.
         if (!status) return null;
+
         state.push(status);
       }
+
       return state;
     }
 
-    // Backward compatibility with the original 2-bit URLs.
+    // Backward compatibility with the original 2-bit format.
     if (binary.length === rows.length * 2) {
       const oldMap = {
         "00": "none",
@@ -2346,10 +2360,13 @@
         "10": "want",
         "11": "never"
       };
+
       const state = [];
+
       for (let i = 0; i < binary.length; i += 2) {
         state.push(oldMap[binary.slice(i, i + 2)]);
       }
+
       return state;
     }
 
@@ -2359,9 +2376,11 @@
   function applyState(state) {
     state.forEach((status, index) => {
       const row = rows[index];
+
       row.querySelectorAll(".status-box").forEach(box => {
         box.checked = box.dataset.status === status;
       });
+
       row.classList.toggle("is-seen", status === "seen");
       row.classList.toggle("is-want", status === "want");
       row.classList.toggle("is-dontwant", status === "dontwant");
@@ -2370,59 +2389,67 @@
   }
 
   function updateCounters(state) {
-    for (const key of Object.keys(counters)) {
-      counters[key].textContent = state.filter(s => s === key).length;
-    }
+    // Always update all four counters, including zero.
+    counters.seen.textContent = state.filter(s => s === "seen").length;
+    counters.want.textContent = state.filter(s => s === "want").length;
+    counters.dontwant.textContent = state.filter(s => s === "dontwant").length;
+    counters.never.textContent = state.filter(s => s === "never").length;
   }
 
-  function updateUrlAndDisplay() {
-    const state = getState();
-    const binary = stateToBinary(state);
-
-    // Hash is deliberately used instead of query parameters so GitHub Pages
-    // can serve the same static index.html for every save ID.
-    const newUrl = window.location.pathname + window.location.search + "#v2=" + binary;
-    window.history.replaceState(null, "", newUrl);
-
-    saveIdEl.textContent = binary;
-    currentUrlEl.textContent = window.location.href;
+  function render(state, updateUrl = false) {
+    applyState(state);
     updateCounters(state);
+
+    const binary = stateToBinary(state);
+    saveIdEl.textContent = binary;
+
+    if (updateUrl) {
+      const newUrl =
+        window.location.pathname +
+        window.location.search +
+        "#v2=" +
+        binary;
+
+      window.history.replaceState(null, "", newUrl);
+    }
+
+    currentUrlEl.textContent = window.location.href;
   }
 
   function loadFromUrl() {
-    const match = window.location.hash.match(/^#(?:v2|s)=([01]+)$/i);
+    const hash = window.location.hash;
+
+    // Accept both the new #v2=... format and the old #s=... format.
+    const match = hash.match(/^#(?:v2|s)=([01]+)$/i);
     const decoded = match ? binaryToState(match[1]) : null;
 
     if (decoded) {
-      applyState(decoded);
+      render(decoded, false);
     } else {
-      applyState(rows.map(() => "none"));
+      render(rows.map(() => "none"), false);
     }
-
-    const state = getState();
-    saveIdEl.textContent = stateToBinary(state);
-    currentUrlEl.textContent = window.location.href;
-    updateCounters(state);
   }
 
   boxes.forEach(box => {
     box.addEventListener("change", () => {
       const row = box.closest(".show-row");
 
-      // Treat the three checkboxes as a single-choice group.
+      // A show can have exactly one status.
       if (box.checked) {
         row.querySelectorAll(".status-box").forEach(other => {
-          if (other !== box) other.checked = false;
+          if (other !== box) {
+            other.checked = false;
+          }
         });
       }
 
-      const state = getState();
-      applyState(state);
-      updateUrlAndDisplay();
+      render(getState(), true);
     });
   });
 
   window.addEventListener("hashchange", loadFromUrl);
+
+  // Important: initialize state AND counters when the page opens.
   loadFromUrl();
 })();
 </script>
