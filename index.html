@@ -1,0 +1,1987 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="A personal tracker for the 100 Best TV Shows of the 21st Century.">
+<title>The 100 Best TV Shows — Personal Tracker</title>
+<style>
+  :root {
+    --ink: #111;
+    --muted: #666;
+    --line: #999;
+    --paper: #fff;
+    --bg: #f5f4f0;
+    --accent: #111;
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body { margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 14px;
+    line-height: 1.25;
+  }
+
+  .page {
+    width: min(1180px, calc(100% - 36px));
+    margin: 28px auto 42px;
+    background: var(--paper);
+    padding: 30px 34px 22px;
+  }
+
+  .masthead {
+    font-family: Georgia, "Times New Roman", serif;
+    font-weight: 700;
+    font-size: clamp(27px, 3.1vw, 39px);
+    letter-spacing: -1.5px;
+    margin-bottom: 7px;
+  }
+
+  h1 {
+    font-family: Georgia, "Times New Roman", serif;
+    font-weight: 400;
+    font-size: clamp(31px, 4.1vw, 53px);
+    line-height: 1.02;
+    letter-spacing: -1.8px;
+    margin: 0 0 20px;
+  }
+
+  .rule {
+    border: 0;
+    border-top: 1px solid var(--ink);
+    margin: 0;
+  }
+
+  .save-panel {
+    padding: 14px 0 13px;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .save-line {
+    display: flex;
+    align-items: baseline;
+    gap: 9px;
+    flex-wrap: wrap;
+    margin-bottom: 6px;
+  }
+
+  .save-label {
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .05em;
+    font-size: 11px;
+  }
+
+  #saveId {
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+    font-size: 11px;
+    overflow-wrap: anywhere;
+    word-break: break-all;
+  }
+
+  .url {
+    color: var(--muted);
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+    font-size: 10px;
+    overflow-wrap: anywhere;
+    word-break: break-all;
+  }
+
+  .legend {
+    color: var(--muted);
+    font-size: 11px;
+    margin-top: 7px;
+  }
+
+  .table-head, .show-row {
+    display: grid;
+    grid-template-columns: 31px minmax(0, 1fr) 92px 112px 128px;
+    column-gap: 9px;
+  }
+
+  .table-head {
+    align-items: end;
+    min-height: 66px;
+    border-bottom: 1px solid var(--ink);
+  }
+
+  .head-spacer { grid-column: 1 / 3; }
+
+  .head-status {
+    text-align: center;
+    font-size: 10px;
+    line-height: 1.15;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .045em;
+    padding-bottom: 9px;
+  }
+
+  .counter {
+    display: block;
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 25px;
+    font-weight: 400;
+    line-height: 1;
+    margin-bottom: 4px;
+    letter-spacing: -1px;
+  }
+
+  .show-row {
+    min-height: 31px;
+    align-items: center;
+    border-bottom: 1px solid #ddd;
+  }
+
+  .rank {
+    text-align: right;
+    font-weight: 700;
+    padding-right: 2px;
+  }
+
+  .show-title {
+    min-width: 0;
+    padding: 6px 0;
+  }
+
+  .show-title strong { font-weight: 700; }
+  .years { color: #222; }
+
+  .check-cell {
+    height: 31px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    position: relative;
+  }
+
+  .check-cell input {
+    position: absolute;
+    opacity: 0;
+    width: 1px;
+    height: 1px;
+  }
+
+  .box {
+    width: 16px;
+    height: 16px;
+    border: 1px solid #777;
+    background: white;
+    display: inline-block;
+    position: relative;
+  }
+
+  .check-cell input:checked + .box {
+    border-color: var(--ink);
+    background: var(--ink);
+  }
+
+  .check-cell input:checked + .box::after {
+    content: "";
+    position: absolute;
+    left: 4px;
+    top: 1px;
+    width: 5px;
+    height: 9px;
+    border: solid white;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+  }
+
+  .check-cell input:focus-visible + .box {
+    outline: 2px solid #777;
+    outline-offset: 2px;
+  }
+
+  .show-row.is-seen .show-title,
+  .show-row.is-want .show-title,
+  .show-row.is-never .show-title {
+    font-weight: 400;
+  }
+
+  .footer {
+    border-top: 1px solid var(--ink);
+    margin-top: 18px;
+    padding-top: 11px;
+    color: #555;
+    font-size: 11px;
+  }
+
+  @media (max-width: 760px) {
+    body { background: var(--paper); }
+    .page {
+      width: 100%;
+      margin: 0;
+      padding: 20px 12px 24px;
+    }
+    .table-head, .show-row {
+      grid-template-columns: 25px minmax(0, 1fr) 48px 58px 67px;
+      column-gap: 5px;
+    }
+    .head-status { font-size: 8px; }
+    .counter { font-size: 20px; }
+    .show-title { font-size: 13px; }
+    .rank { font-size: 12px; }
+    .years { white-space: nowrap; }
+  }
+
+  @media print {
+    body { background: white; }
+    .page { width: 100%; margin: 0; padding: 10px; }
+    .save-panel { display: none; }
+  }
+</style>
+</head>
+<body>
+<main class="page">
+  <div class="masthead">TV SHOWS</div>
+  <h1>The 100 Best TV Shows of the 21st Century</h1>
+  <hr class="rule">
+
+  <section class="save-panel" aria-live="polite" hidden>
+    <div class="save-line">
+      <span class="save-label">Save ID (binary)</span>
+      <code id="saveId">0 × 200 bits</code>
+    </div>
+    <div class="url" id="currentUrl"></div>
+    <div class="legend">Each show uses 2 bits: <b>00</b> = unclassified · <b>01</b> = seen · <b>10</b> = want to see · <b>11</b> = never heard of it. The ID is encoded in the URL hash, so sharing the URL reproduces the selection.</div>
+  </section>
+
+  <div class="table-head">
+    <div class="head-spacer"></div>
+    <div class="head-status">
+      <span class="counter" id="seenCount">0</span>
+      Seen
+    </div>
+    <div class="head-status">
+      <span class="counter" id="wantCount">0</span>
+      Want to see
+    </div>
+    <div class="head-status">
+      <span class="counter" id="neverCount">0</span>
+      Never heard of it
+    </div>
+  </div>
+
+  <section id="shows" aria-label="TV show checklist">
+    
+      <div class="show-row" data-index="0">
+        <div class="rank">1.</div>
+        <div class="show-title"><strong>Breaking Bad</strong> <span class="years">(2008-2013)</span></div>
+        <label class="check-cell" title="Seen">
+          <input type="checkbox" class="status-box" data-status="seen" aria-label="1. Breaking Bad — Seen">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Want to see">
+          <input type="checkbox" class="status-box" data-status="want" aria-label="1. Breaking Bad — Want to see">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Never heard of it">
+          <input type="checkbox" class="status-box" data-status="never" aria-label="1. Breaking Bad — Never heard of it">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+      </div>
+      <div class="show-row" data-index="1">
+        <div class="rank">2.</div>
+        <div class="show-title"><strong>The Wire</strong> <span class="years">(2002-2008)</span></div>
+        <label class="check-cell" title="Seen">
+          <input type="checkbox" class="status-box" data-status="seen" aria-label="2. The Wire — Seen">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Want to see">
+          <input type="checkbox" class="status-box" data-status="want" aria-label="2. The Wire — Want to see">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Never heard of it">
+          <input type="checkbox" class="status-box" data-status="never" aria-label="2. The Wire — Never heard of it">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+      </div>
+      <div class="show-row" data-index="2">
+        <div class="rank">3.</div>
+        <div class="show-title"><strong>Mad Men</strong> <span class="years">(2007-2015)</span></div>
+        <label class="check-cell" title="Seen">
+          <input type="checkbox" class="status-box" data-status="seen" aria-label="3. Mad Men — Seen">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Want to see">
+          <input type="checkbox" class="status-box" data-status="want" aria-label="3. Mad Men — Want to see">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Never heard of it">
+          <input type="checkbox" class="status-box" data-status="never" aria-label="3. Mad Men — Never heard of it">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+      </div>
+      <div class="show-row" data-index="3">
+        <div class="rank">4.</div>
+        <div class="show-title"><strong>Succession</strong> <span class="years">(2018-2023)</span></div>
+        <label class="check-cell" title="Seen">
+          <input type="checkbox" class="status-box" data-status="seen" aria-label="4. Succession — Seen">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Want to see">
+          <input type="checkbox" class="status-box" data-status="want" aria-label="4. Succession — Want to see">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Never heard of it">
+          <input type="checkbox" class="status-box" data-status="never" aria-label="4. Succession — Never heard of it">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+      </div>
+      <div class="show-row" data-index="4">
+        <div class="rank">5.</div>
+        <div class="show-title"><strong>Fleabag</strong> <span class="years">(2016-2019)</span></div>
+        <label class="check-cell" title="Seen">
+          <input type="checkbox" class="status-box" data-status="seen" aria-label="5. Fleabag — Seen">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Want to see">
+          <input type="checkbox" class="status-box" data-status="want" aria-label="5. Fleabag — Want to see">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Never heard of it">
+          <input type="checkbox" class="status-box" data-status="never" aria-label="5. Fleabag — Never heard of it">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+      </div>
+      <div class="show-row" data-index="5">
+        <div class="rank">6.</div>
+        <div class="show-title"><strong>Game of Thrones</strong> <span class="years">(2011-2019)</span></div>
+        <label class="check-cell" title="Seen">
+          <input type="checkbox" class="status-box" data-status="seen" aria-label="6. Game of Thrones — Seen">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Want to see">
+          <input type="checkbox" class="status-box" data-status="want" aria-label="6. Game of Thrones — Want to see">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Never heard of it">
+          <input type="checkbox" class="status-box" data-status="never" aria-label="6. Game of Thrones — Never heard of it">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+      </div>
+      <div class="show-row" data-index="6">
+        <div class="rank">7.</div>
+        <div class="show-title"><strong>Veep</strong> <span class="years">(2012-2019)</span></div>
+        <label class="check-cell" title="Seen">
+          <input type="checkbox" class="status-box" data-status="seen" aria-label="7. Veep — Seen">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Want to see">
+          <input type="checkbox" class="status-box" data-status="want" aria-label="7. Veep — Want to see">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Never heard of it">
+          <input type="checkbox" class="status-box" data-status="never" aria-label="7. Veep — Never heard of it">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+      </div>
+      <div class="show-row" data-index="7">
+        <div class="rank">8.</div>
+        <div class="show-title"><strong>30 Rock</strong> <span class="years">(2006-2013)</span></div>
+        <label class="check-cell" title="Seen">
+          <input type="checkbox" class="status-box" data-status="seen" aria-label="8. 30 Rock — Seen">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Want to see">
+          <input type="checkbox" class="status-box" data-status="want" aria-label="8. 30 Rock — Want to see">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Never heard of it">
+          <input type="checkbox" class="status-box" data-status="never" aria-label="8. 30 Rock — Never heard of it">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+      </div>
+      <div class="show-row" data-index="8">
+        <div class="rank">9.</div>
+        <div class="show-title"><strong>Curb Your Enthusiasm</strong> <span class="years">(2000-2024)</span></div>
+        <label class="check-cell" title="Seen">
+          <input type="checkbox" class="status-box" data-status="seen" aria-label="9. Curb Your Enthusiasm — Seen">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Want to see">
+          <input type="checkbox" class="status-box" data-status="want" aria-label="9. Curb Your Enthusiasm — Want to see">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Never heard of it">
+          <input type="checkbox" class="status-box" data-status="never" aria-label="9. Curb Your Enthusiasm — Never heard of it">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+      </div>
+      <div class="show-row" data-index="9">
+        <div class="rank">10.</div>
+        <div class="show-title"><strong>Atlanta</strong> <span class="years">(2016-2022)</span></div>
+        <label class="check-cell" title="Seen">
+          <input type="checkbox" class="status-box" data-status="seen" aria-label="10. Atlanta — Seen">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Want to see">
+          <input type="checkbox" class="status-box" data-status="want" aria-label="10. Atlanta — Want to see">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Never heard of it">
+          <input type="checkbox" class="status-box" data-status="never" aria-label="10. Atlanta — Never heard of it">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+      </div>
+      <div class="show-row" data-index="10">
+        <div class="rank">11.</div>
+        <div class="show-title"><strong>The Office (U.S.)</strong> <span class="years">(2005-2013)</span></div>
+        <label class="check-cell" title="Seen">
+          <input type="checkbox" class="status-box" data-status="seen" aria-label="11. The Office (U.S.) — Seen">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Want to see">
+          <input type="checkbox" class="status-box" data-status="want" aria-label="11. The Office (U.S.) — Want to see">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Never heard of it">
+          <input type="checkbox" class="status-box" data-status="never" aria-label="11. The Office (U.S.) — Never heard of it">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+      </div>
+      <div class="show-row" data-index="11">
+        <div class="rank">12.</div>
+        <div class="show-title"><strong>Arrested Development</strong> <span class="years">(2003-2019)</span></div>
+        <label class="check-cell" title="Seen">
+          <input type="checkbox" class="status-box" data-status="seen" aria-label="12. Arrested Development — Seen">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Want to see">
+          <input type="checkbox" class="status-box" data-status="want" aria-label="12. Arrested Development — Want to see">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Never heard of it">
+          <input type="checkbox" class="status-box" data-status="never" aria-label="12. Arrested Development — Never heard of it">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+      </div>
+      <div class="show-row" data-index="12">
+        <div class="rank">13.</div>
+        <div class="show-title"><strong>Girls</strong> <span class="years">(2012-2017)</span></div>
+        <label class="check-cell" title="Seen">
+          <input type="checkbox" class="status-box" data-status="seen" aria-label="13. Girls — Seen">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Want to see">
+          <input type="checkbox" class="status-box" data-status="want" aria-label="13. Girls — Want to see">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Never heard of it">
+          <input type="checkbox" class="status-box" data-status="never" aria-label="13. Girls — Never heard of it">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+      </div>
+      <div class="show-row" data-index="13">
+        <div class="rank">14.</div>
+        <div class="show-title"><strong>Friday Night Lights</strong> <span class="years">(2006-2011)</span></div>
+        <label class="check-cell" title="Seen">
+          <input type="checkbox" class="status-box" data-status="seen" aria-label="14. Friday Night Lights — Seen">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Want to see">
+          <input type="checkbox" class="status-box" data-status="want" aria-label="14. Friday Night Lights — Want to see">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Never heard of it">
+          <input type="checkbox" class="status-box" data-status="never" aria-label="14. Friday Night Lights — Never heard of it">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+      </div>
+      <div class="show-row" data-index="14">
+        <div class="rank">15.</div>
+        <div class="show-title"><strong>Six Feet Under</strong> <span class="years">(2001-2005)</span></div>
+        <label class="check-cell" title="Seen">
+          <input type="checkbox" class="status-box" data-status="seen" aria-label="15. Six Feet Under — Seen">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Want to see">
+          <input type="checkbox" class="status-box" data-status="want" aria-label="15. Six Feet Under — Want to see">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Never heard of it">
+          <input type="checkbox" class="status-box" data-status="never" aria-label="15. Six Feet Under — Never heard of it">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+      </div>
+      <div class="show-row" data-index="15">
+        <div class="rank">16.</div>
+        <div class="show-title"><strong>The Office (U.K.)</strong> <span class="years">(2001-2003)</span></div>
+        <label class="check-cell" title="Seen">
+          <input type="checkbox" class="status-box" data-status="seen" aria-label="16. The Office (U.K.) — Seen">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Want to see">
+          <input type="checkbox" class="status-box" data-status="want" aria-label="16. The Office (U.K.) — Want to see">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Never heard of it">
+          <input type="checkbox" class="status-box" data-status="never" aria-label="16. The Office (U.K.) — Never heard of it">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+      </div>
+      <div class="show-row" data-index="16">
+        <div class="rank">17.</div>
+        <div class="show-title"><strong>The Americans</strong> <span class="years">(2013-2018)</span></div>
+        <label class="check-cell" title="Seen">
+          <input type="checkbox" class="status-box" data-status="seen" aria-label="17. The Americans — Seen">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Want to see">
+          <input type="checkbox" class="status-box" data-status="want" aria-label="17. The Americans — Want to see">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Never heard of it">
+          <input type="checkbox" class="status-box" data-status="never" aria-label="17. The Americans — Never heard of it">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+      </div>
+      <div class="show-row" data-index="17">
+        <div class="rank">18.</div>
+        <div class="show-title"><strong>I May Destroy You</strong> <span class="years">(2020)</span></div>
+        <label class="check-cell" title="Seen">
+          <input type="checkbox" class="status-box" data-status="seen" aria-label="18. I May Destroy You — Seen">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Want to see">
+          <input type="checkbox" class="status-box" data-status="want" aria-label="18. I May Destroy You — Want to see">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Never heard of it">
+          <input type="checkbox" class="status-box" data-status="never" aria-label="18. I May Destroy You — Never heard of it">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+      </div>
+      <div class="show-row" data-index="18">
+        <div class="rank">19.</div>
+        <div class="show-title"><strong>Chernobyl</strong> <span class="years">(2019)</span></div>
+        <label class="check-cell" title="Seen">
+          <input type="checkbox" class="status-box" data-status="seen" aria-label="19. Chernobyl — Seen">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Want to see">
+          <input type="checkbox" class="status-box" data-status="want" aria-label="19. Chernobyl — Want to see">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Never heard of it">
+          <input type="checkbox" class="status-box" data-status="never" aria-label="19. Chernobyl — Never heard of it">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+      </div>
+      <div class="show-row" data-index="19">
+        <div class="rank">20.</div>
+        <div class="show-title"><strong>The Crown</strong> <span class="years">(2016-2023)</span></div>
+        <label class="check-cell" title="Seen">
+          <input type="checkbox" class="status-box" data-status="seen" aria-label="20. The Crown — Seen">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Want to see">
+          <input type="checkbox" class="status-box" data-status="want" aria-label="20. The Crown — Want to see">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Never heard of it">
+          <input type="checkbox" class="status-box" data-status="never" aria-label="20. The Crown — Never heard of it">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+      </div>
+      <div class="show-row" data-index="20">
+        <div class="rank">21.</div>
+        <div class="show-title"><strong>The White Lotus</strong> <span class="years">(2021-present)</span></div>
+        <label class="check-cell" title="Seen">
+          <input type="checkbox" class="status-box" data-status="seen" aria-label="21. The White Lotus — Seen">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Want to see">
+          <input type="checkbox" class="status-box" data-status="want" aria-label="21. The White Lotus — Want to see">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Never heard of it">
+          <input type="checkbox" class="status-box" data-status="never" aria-label="21. The White Lotus — Never heard of it">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+      </div>
+      <div class="show-row" data-index="21">
+        <div class="rank">22.</div>
+        <div class="show-title"><strong>Lost</strong> <span class="years">(2004-2010)</span></div>
+        <label class="check-cell" title="Seen">
+          <input type="checkbox" class="status-box" data-status="seen" aria-label="22. Lost — Seen">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Want to see">
+          <input type="checkbox" class="status-box" data-status="want" aria-label="22. Lost — Want to see">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Never heard of it">
+          <input type="checkbox" class="status-box" data-status="never" aria-label="22. Lost — Never heard of it">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+      </div>
+      <div class="show-row" data-index="22">
+        <div class="rank">23.</div>
+        <div class="show-title"><strong>The Comeback</strong> <span class="years">(2005-2026)</span></div>
+        <label class="check-cell" title="Seen">
+          <input type="checkbox" class="status-box" data-status="seen" aria-label="23. The Comeback — Seen">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Want to see">
+          <input type="checkbox" class="status-box" data-status="want" aria-label="23. The Comeback — Want to see">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Never heard of it">
+          <input type="checkbox" class="status-box" data-status="never" aria-label="23. The Comeback — Never heard of it">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+      </div>
+      <div class="show-row" data-index="23">
+        <div class="rank">24.</div>
+        <div class="show-title"><strong>Deadwood</strong> <span class="years">(2004-2006)</span></div>
+        <label class="check-cell" title="Seen">
+          <input type="checkbox" class="status-box" data-status="seen" aria-label="24. Deadwood — Seen">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Want to see">
+          <input type="checkbox" class="status-box" data-status="want" aria-label="24. Deadwood — Want to see">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Never heard of it">
+          <input type="checkbox" class="status-box" data-status="never" aria-label="24. Deadwood — Never heard of it">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+      </div>
+      <div class="show-row" data-index="24">
+        <div class="rank">25.</div>
+        <div class="show-title"><strong>The Leftovers</strong> <span class="years">(2014-2017)</span></div>
+        <label class="check-cell" title="Seen">
+          <input type="checkbox" class="status-box" data-status="seen" aria-label="25. The Leftovers — Seen">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Want to see">
+          <input type="checkbox" class="status-box" data-status="want" aria-label="25. The Leftovers — Want to see">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Never heard of it">
+          <input type="checkbox" class="status-box" data-status="never" aria-label="25. The Leftovers — Never heard of it">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+      </div>
+      <div class="show-row" data-index="25">
+        <div class="rank">26.</div>
+        <div class="show-title"><strong>Black Mirror</strong> <span class="years">(2011-present)</span></div>
+        <label class="check-cell" title="Seen">
+          <input type="checkbox" class="status-box" data-status="seen" aria-label="26. Black Mirror — Seen">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Want to see">
+          <input type="checkbox" class="status-box" data-status="want" aria-label="26. Black Mirror — Want to see">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Never heard of it">
+          <input type="checkbox" class="status-box" data-status="never" aria-label="26. Black Mirror — Never heard of it">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+      </div>
+      <div class="show-row" data-index="26">
+        <div class="rank">27.</div>
+        <div class="show-title"><strong>Better Call Saul</strong> <span class="years">(2015-2022)</span></div>
+        <label class="check-cell" title="Seen">
+          <input type="checkbox" class="status-box" data-status="seen" aria-label="27. Better Call Saul — Seen">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Want to see">
+          <input type="checkbox" class="status-box" data-status="want" aria-label="27. Better Call Saul — Want to see">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Never heard of it">
+          <input type="checkbox" class="status-box" data-status="never" aria-label="27. Better Call Saul — Never heard of it">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+      </div>
+      <div class="show-row" data-index="27">
+        <div class="rank">28.</div>
+        <div class="show-title"><strong>Band of Brothers</strong> <span class="years">(2001)</span></div>
+        <label class="check-cell" title="Seen">
+          <input type="checkbox" class="status-box" data-status="seen" aria-label="28. Band of Brothers — Seen">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Want to see">
+          <input type="checkbox" class="status-box" data-status="want" aria-label="28. Band of Brothers — Want to see">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Never heard of it">
+          <input type="checkbox" class="status-box" data-status="never" aria-label="28. Band of Brothers — Never heard of it">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+      </div>
+      <div class="show-row" data-index="28">
+        <div class="rank">29.</div>
+        <div class="show-title"><strong>Key &amp; Peele</strong> <span class="years">(2012-2015)</span></div>
+        <label class="check-cell" title="Seen">
+          <input type="checkbox" class="status-box" data-status="seen" aria-label="29. Key &amp; Peele — Seen">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Want to see">
+          <input type="checkbox" class="status-box" data-status="want" aria-label="29. Key &amp; Peele — Want to see">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Never heard of it">
+          <input type="checkbox" class="status-box" data-status="never" aria-label="29. Key &amp; Peele — Never heard of it">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+      </div>
+      <div class="show-row" data-index="29">
+        <div class="rank">30.</div>
+        <div class="show-title"><strong>Severance</strong> <span class="years">(2022-present)</span></div>
+        <label class="check-cell" title="Seen">
+          <input type="checkbox" class="status-box" data-status="seen" aria-label="30. Severance — Seen">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Want to see">
+          <input type="checkbox" class="status-box" data-status="want" aria-label="30. Severance — Want to see">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Never heard of it">
+          <input type="checkbox" class="status-box" data-status="never" aria-label="30. Severance — Never heard of it">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+      </div>
+      <div class="show-row" data-index="30">
+        <div class="rank">31.</div>
+        <div class="show-title"><strong>Survivor</strong> <span class="years">(2000-present)</span></div>
+        <label class="check-cell" title="Seen">
+          <input type="checkbox" class="status-box" data-status="seen" aria-label="31. Survivor — Seen">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Want to see">
+          <input type="checkbox" class="status-box" data-status="want" aria-label="31. Survivor — Want to see">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Never heard of it">
+          <input type="checkbox" class="status-box" data-status="never" aria-label="31. Survivor — Never heard of it">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+      </div>
+      <div class="show-row" data-index="31">
+        <div class="rank">32.</div>
+        <div class="show-title"><strong>Andor</strong> <span class="years">(2022-2025)</span></div>
+        <label class="check-cell" title="Seen">
+          <input type="checkbox" class="status-box" data-status="seen" aria-label="32. Andor — Seen">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Want to see">
+          <input type="checkbox" class="status-box" data-status="want" aria-label="32. Andor — Want to see">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Never heard of it">
+          <input type="checkbox" class="status-box" data-status="never" aria-label="32. Andor — Never heard of it">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+      </div>
+      <div class="show-row" data-index="32">
+        <div class="rank">33.</div>
+        <div class="show-title"><strong>Enlightened</strong> <span class="years">(2011-2013)</span></div>
+        <label class="check-cell" title="Seen">
+          <input type="checkbox" class="status-box" data-status="seen" aria-label="33. Enlightened — Seen">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Want to see">
+          <input type="checkbox" class="status-box" data-status="want" aria-label="33. Enlightened — Want to see">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Never heard of it">
+          <input type="checkbox" class="status-box" data-status="never" aria-label="33. Enlightened — Never heard of it">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+      </div>
+      <div class="show-row" data-index="33">
+        <div class="rank">34.</div>
+        <div class="show-title"><strong>Schitt’s Creek</strong> <span class="years">(2015-2020)</span></div>
+        <label class="check-cell" title="Seen">
+          <input type="checkbox" class="status-box" data-status="seen" aria-label="34. Schitt’s Creek — Seen">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Want to see">
+          <input type="checkbox" class="status-box" data-status="want" aria-label="34. Schitt’s Creek — Want to see">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Never heard of it">
+          <input type="checkbox" class="status-box" data-status="never" aria-label="34. Schitt’s Creek — Never heard of it">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+      </div>
+      <div class="show-row" data-index="34">
+        <div class="rank">35.</div>
+        <div class="show-title"><strong>True Detective (Season 1)</strong> <span class="years">(2014)</span></div>
+        <label class="check-cell" title="Seen">
+          <input type="checkbox" class="status-box" data-status="seen" aria-label="35. True Detective (Season 1) — Seen">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Want to see">
+          <input type="checkbox" class="status-box" data-status="want" aria-label="35. True Detective (Season 1) — Want to see">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Never heard of it">
+          <input type="checkbox" class="status-box" data-status="never" aria-label="35. True Detective (Season 1) — Never heard of it">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+      </div>
+      <div class="show-row" data-index="35">
+        <div class="rank">36.</div>
+        <div class="show-title"><strong>The Pitt</strong> <span class="years">(2025-present)</span></div>
+        <label class="check-cell" title="Seen">
+          <input type="checkbox" class="status-box" data-status="seen" aria-label="36. The Pitt — Seen">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Want to see">
+          <input type="checkbox" class="status-box" data-status="want" aria-label="36. The Pitt — Want to see">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Never heard of it">
+          <input type="checkbox" class="status-box" data-status="never" aria-label="36. The Pitt — Never heard of it">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+      </div>
+      <div class="show-row" data-index="36">
+        <div class="rank">37.</div>
+        <div class="show-title"><strong>Battlestar Galactica</strong> <span class="years">(2005-2009)</span></div>
+        <label class="check-cell" title="Seen">
+          <input type="checkbox" class="status-box" data-status="seen" aria-label="37. Battlestar Galactica — Seen">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Want to see">
+          <input type="checkbox" class="status-box" data-status="want" aria-label="37. Battlestar Galactica — Want to see">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Never heard of it">
+          <input type="checkbox" class="status-box" data-status="never" aria-label="37. Battlestar Galactica — Never heard of it">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+      </div>
+      <div class="show-row" data-index="37">
+        <div class="rank">38.</div>
+        <div class="show-title"><strong>Homeland</strong> <span class="years">(2011-2020)</span></div>
+        <label class="check-cell" title="Seen">
+          <input type="checkbox" class="status-box" data-status="seen" aria-label="38. Homeland — Seen">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Want to see">
+          <input type="checkbox" class="status-box" data-status="want" aria-label="38. Homeland — Want to see">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Never heard of it">
+          <input type="checkbox" class="status-box" data-status="never" aria-label="38. Homeland — Never heard of it">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+      </div>
+      <div class="show-row" data-index="38">
+        <div class="rank">39.</div>
+        <div class="show-title"><strong>Watchmen</strong> <span class="years">(2019)</span></div>
+        <label class="check-cell" title="Seen">
+          <input type="checkbox" class="status-box" data-status="seen" aria-label="39. Watchmen — Seen">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Want to see">
+          <input type="checkbox" class="status-box" data-status="want" aria-label="39. Watchmen — Want to see">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Never heard of it">
+          <input type="checkbox" class="status-box" data-status="never" aria-label="39. Watchmen — Never heard of it">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+      </div>
+      <div class="show-row" data-index="39">
+        <div class="rank">40.</div>
+        <div class="show-title"><strong>Adolescence</strong> <span class="years">(2025)</span></div>
+        <label class="check-cell" title="Seen">
+          <input type="checkbox" class="status-box" data-status="seen" aria-label="40. Adolescence — Seen">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Want to see">
+          <input type="checkbox" class="status-box" data-status="want" aria-label="40. Adolescence — Want to see">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Never heard of it">
+          <input type="checkbox" class="status-box" data-status="never" aria-label="40. Adolescence — Never heard of it">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+      </div>
+      <div class="show-row" data-index="40">
+        <div class="rank">41.</div>
+        <div class="show-title"><strong>Louie</strong> <span class="years">(2010-2015)</span></div>
+        <label class="check-cell" title="Seen">
+          <input type="checkbox" class="status-box" data-status="seen" aria-label="41. Louie — Seen">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Want to see">
+          <input type="checkbox" class="status-box" data-status="want" aria-label="41. Louie — Want to see">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Never heard of it">
+          <input type="checkbox" class="status-box" data-status="never" aria-label="41. Louie — Never heard of it">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+      </div>
+      <div class="show-row" data-index="41">
+        <div class="rank">42.</div>
+        <div class="show-title"><strong>Hacks</strong> <span class="years">(2021-2026)</span></div>
+        <label class="check-cell" title="Seen">
+          <input type="checkbox" class="status-box" data-status="seen" aria-label="42. Hacks — Seen">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Want to see">
+          <input type="checkbox" class="status-box" data-status="want" aria-label="42. Hacks — Want to see">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Never heard of it">
+          <input type="checkbox" class="status-box" data-status="never" aria-label="42. Hacks — Never heard of it">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+      </div>
+      <div class="show-row" data-index="42">
+        <div class="rank">43.</div>
+        <div class="show-title"><strong>Peaky Blinders</strong> <span class="years">(2013-2022)</span></div>
+        <label class="check-cell" title="Seen">
+          <input type="checkbox" class="status-box" data-status="seen" aria-label="43. Peaky Blinders — Seen">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Want to see">
+          <input type="checkbox" class="status-box" data-status="want" aria-label="43. Peaky Blinders — Want to see">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Never heard of it">
+          <input type="checkbox" class="status-box" data-status="never" aria-label="43. Peaky Blinders — Never heard of it">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+      </div>
+      <div class="show-row" data-index="43">
+        <div class="rank">44.</div>
+        <div class="show-title"><strong>BoJack Horseman</strong> <span class="years">(2014-2020)</span></div>
+        <label class="check-cell" title="Seen">
+          <input type="checkbox" class="status-box" data-status="seen" aria-label="44. BoJack Horseman — Seen">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Want to see">
+          <input type="checkbox" class="status-box" data-status="want" aria-label="44. BoJack Horseman — Want to see">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Never heard of it">
+          <input type="checkbox" class="status-box" data-status="never" aria-label="44. BoJack Horseman — Never heard of it">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+      </div>
+      <div class="show-row" data-index="44">
+        <div class="rank">45.</div>
+        <div class="show-title"><strong>Happy Valley</strong> <span class="years">(2014-2023)</span></div>
+        <label class="check-cell" title="Seen">
+          <input type="checkbox" class="status-box" data-status="seen" aria-label="45. Happy Valley — Seen">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Want to see">
+          <input type="checkbox" class="status-box" data-status="want" aria-label="45. Happy Valley — Want to see">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Never heard of it">
+          <input type="checkbox" class="status-box" data-status="never" aria-label="45. Happy Valley — Never heard of it">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+      </div>
+      <div class="show-row" data-index="45">
+        <div class="rank">46.</div>
+        <div class="show-title"><strong>Broad City</strong> <span class="years">(2014-2019)</span></div>
+        <label class="check-cell" title="Seen">
+          <input type="checkbox" class="status-box" data-status="seen" aria-label="46. Broad City — Seen">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Want to see">
+          <input type="checkbox" class="status-box" data-status="want" aria-label="46. Broad City — Want to see">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Never heard of it">
+          <input type="checkbox" class="status-box" data-status="never" aria-label="46. Broad City — Never heard of it">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+      </div>
+      <div class="show-row" data-index="46">
+        <div class="rank">47.</div>
+        <div class="show-title"><strong>Twin Peaks: The Return</strong> <span class="years">(2017)</span></div>
+        <label class="check-cell" title="Seen">
+          <input type="checkbox" class="status-box" data-status="seen" aria-label="47. Twin Peaks: The Return — Seen">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Want to see">
+          <input type="checkbox" class="status-box" data-status="want" aria-label="47. Twin Peaks: The Return — Want to see">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Never heard of it">
+          <input type="checkbox" class="status-box" data-status="never" aria-label="47. Twin Peaks: The Return — Never heard of it">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+      </div>
+      <div class="show-row" data-index="47">
+        <div class="rank">48.</div>
+        <div class="show-title"><strong>House of Cards</strong> <span class="years">(2013-2018)</span></div>
+        <label class="check-cell" title="Seen">
+          <input type="checkbox" class="status-box" data-status="seen" aria-label="48. House of Cards — Seen">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Want to see">
+          <input type="checkbox" class="status-box" data-status="want" aria-label="48. House of Cards — Want to see">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Never heard of it">
+          <input type="checkbox" class="status-box" data-status="never" aria-label="48. House of Cards — Never heard of it">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+      </div>
+      <div class="show-row" data-index="48">
+        <div class="rank">49.</div>
+        <div class="show-title"><strong>Normal People</strong> <span class="years">(2020)</span></div>
+        <label class="check-cell" title="Seen">
+          <input type="checkbox" class="status-box" data-status="seen" aria-label="49. Normal People — Seen">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Want to see">
+          <input type="checkbox" class="status-box" data-status="want" aria-label="49. Normal People — Want to see">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Never heard of it">
+          <input type="checkbox" class="status-box" data-status="never" aria-label="49. Normal People — Never heard of it">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+      </div>
+      <div class="show-row" data-index="49">
+        <div class="rank">50.</div>
+        <div class="show-title"><strong>Parks and Recreation</strong> <span class="years">(2009-2015)</span></div>
+        <label class="check-cell" title="Seen">
+          <input type="checkbox" class="status-box" data-status="seen" aria-label="50. Parks and Recreation — Seen">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Want to see">
+          <input type="checkbox" class="status-box" data-status="want" aria-label="50. Parks and Recreation — Want to see">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Never heard of it">
+          <input type="checkbox" class="status-box" data-status="never" aria-label="50. Parks and Recreation — Never heard of it">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+      </div>
+      <div class="show-row" data-index="50">
+        <div class="rank">51.</div>
+        <div class="show-title"><strong>The Good Place</strong> <span class="years">(2016-2020)</span></div>
+        <label class="check-cell" title="Seen">
+          <input type="checkbox" class="status-box" data-status="seen" aria-label="51. The Good Place — Seen">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Want to see">
+          <input type="checkbox" class="status-box" data-status="want" aria-label="51. The Good Place — Want to see">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Never heard of it">
+          <input type="checkbox" class="status-box" data-status="never" aria-label="51. The Good Place — Never heard of it">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+      </div>
+      <div class="show-row" data-index="51">
+        <div class="rank">52.</div>
+        <div class="show-title"><strong>Downton Abbey</strong> <span class="years">(2010-2015)</span></div>
+        <label class="check-cell" title="Seen">
+          <input type="checkbox" class="status-box" data-status="seen" aria-label="52. Downton Abbey — Seen">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Want to see">
+          <input type="checkbox" class="status-box" data-status="want" aria-label="52. Downton Abbey — Want to see">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Never heard of it">
+          <input type="checkbox" class="status-box" data-status="never" aria-label="52. Downton Abbey — Never heard of it">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+      </div>
+      <div class="show-row" data-index="52">
+        <div class="rank">53.</div>
+        <div class="show-title"><strong>Stranger Things</strong> <span class="years">(2016-2025)</span></div>
+        <label class="check-cell" title="Seen">
+          <input type="checkbox" class="status-box" data-status="seen" aria-label="53. Stranger Things — Seen">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Want to see">
+          <input type="checkbox" class="status-box" data-status="want" aria-label="53. Stranger Things — Want to see">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Never heard of it">
+          <input type="checkbox" class="status-box" data-status="never" aria-label="53. Stranger Things — Never heard of it">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+      </div>
+      <div class="show-row" data-index="53">
+        <div class="rank">54.</div>
+        <div class="show-title"><strong>The Bureau</strong> <span class="years">(2015-2020)</span></div>
+        <label class="check-cell" title="Seen">
+          <input type="checkbox" class="status-box" data-status="seen" aria-label="54. The Bureau — Seen">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Want to see">
+          <input type="checkbox" class="status-box" data-status="want" aria-label="54. The Bureau — Want to see">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Never heard of it">
+          <input type="checkbox" class="status-box" data-status="never" aria-label="54. The Bureau — Never heard of it">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+      </div>
+      <div class="show-row" data-index="54">
+        <div class="rank">55.</div>
+        <div class="show-title"><strong>Insecure</strong> <span class="years">(2016-2021)</span></div>
+        <label class="check-cell" title="Seen">
+          <input type="checkbox" class="status-box" data-status="seen" aria-label="55. Insecure — Seen">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Want to see">
+          <input type="checkbox" class="status-box" data-status="want" aria-label="55. Insecure — Want to see">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Never heard of it">
+          <input type="checkbox" class="status-box" data-status="never" aria-label="55. Insecure — Never heard of it">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+      </div>
+      <div class="show-row" data-index="55">
+        <div class="rank">56.</div>
+        <div class="show-title"><strong>Nathan for You</strong> <span class="years">(2013-2017)</span></div>
+        <label class="check-cell" title="Seen">
+          <input type="checkbox" class="status-box" data-status="seen" aria-label="56. Nathan for You — Seen">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Want to see">
+          <input type="checkbox" class="status-box" data-status="want" aria-label="56. Nathan for You — Want to see">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Never heard of it">
+          <input type="checkbox" class="status-box" data-status="never" aria-label="56. Nathan for You — Never heard of it">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+      </div>
+      <div class="show-row" data-index="56">
+        <div class="rank">57.</div>
+        <div class="show-title"><strong>I Think You Should Leave</strong> <span class="years">(2019-present)</span></div>
+        <label class="check-cell" title="Seen">
+          <input type="checkbox" class="status-box" data-status="seen" aria-label="57. I Think You Should Leave — Seen">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Want to see">
+          <input type="checkbox" class="status-box" data-status="want" aria-label="57. I Think You Should Leave — Want to see">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Never heard of it">
+          <input type="checkbox" class="status-box" data-status="never" aria-label="57. I Think You Should Leave — Never heard of it">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+      </div>
+      <div class="show-row" data-index="57">
+        <div class="rank">58.</div>
+        <div class="show-title"><strong>Chappelle’s Show</strong> <span class="years">(2003-2006)</span></div>
+        <label class="check-cell" title="Seen">
+          <input type="checkbox" class="status-box" data-status="seen" aria-label="58. Chappelle’s Show — Seen">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Want to see">
+          <input type="checkbox" class="status-box" data-status="want" aria-label="58. Chappelle’s Show — Want to see">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Never heard of it">
+          <input type="checkbox" class="status-box" data-status="never" aria-label="58. Chappelle’s Show — Never heard of it">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+      </div>
+      <div class="show-row" data-index="58">
+        <div class="rank">59.</div>
+        <div class="show-title"><strong>PEN15</strong> <span class="years">(2019-2021)</span></div>
+        <label class="check-cell" title="Seen">
+          <input type="checkbox" class="status-box" data-status="seen" aria-label="59. PEN15 — Seen">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Want to see">
+          <input type="checkbox" class="status-box" data-status="want" aria-label="59. PEN15 — Want to see">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Never heard of it">
+          <input type="checkbox" class="status-box" data-status="never" aria-label="59. PEN15 — Never heard of it">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+      </div>
+      <div class="show-row" data-index="59">
+        <div class="rank">60.</div>
+        <div class="show-title"><strong>Peep Show</strong> <span class="years">(2003-2015)</span></div>
+        <label class="check-cell" title="Seen">
+          <input type="checkbox" class="status-box" data-status="seen" aria-label="60. Peep Show — Seen">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Want to see">
+          <input type="checkbox" class="status-box" data-status="want" aria-label="60. Peep Show — Want to see">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Never heard of it">
+          <input type="checkbox" class="status-box" data-status="never" aria-label="60. Peep Show — Never heard of it">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+      </div>
+      <div class="show-row" data-index="60">
+        <div class="rank">61.</div>
+        <div class="show-title"><strong>RuPaul’s Drag Race</strong> <span class="years">(2009-present)</span></div>
+        <label class="check-cell" title="Seen">
+          <input type="checkbox" class="status-box" data-status="seen" aria-label="61. RuPaul’s Drag Race — Seen">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Want to see">
+          <input type="checkbox" class="status-box" data-status="want" aria-label="61. RuPaul’s Drag Race — Want to see">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Never heard of it">
+          <input type="checkbox" class="status-box" data-status="never" aria-label="61. RuPaul’s Drag Race — Never heard of it">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+      </div>
+      <div class="show-row" data-index="61">
+        <div class="rank">62.</div>
+        <div class="show-title"><strong>Slow Horses</strong> <span class="years">(2022-present)</span></div>
+        <label class="check-cell" title="Seen">
+          <input type="checkbox" class="status-box" data-status="seen" aria-label="62. Slow Horses — Seen">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Want to see">
+          <input type="checkbox" class="status-box" data-status="want" aria-label="62. Slow Horses — Want to see">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Never heard of it">
+          <input type="checkbox" class="status-box" data-status="never" aria-label="62. Slow Horses — Never heard of it">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+      </div>
+      <div class="show-row" data-index="62">
+        <div class="rank">63.</div>
+        <div class="show-title"><strong>The Thick of It</strong> <span class="years">(2005-2012)</span></div>
+        <label class="check-cell" title="Seen">
+          <input type="checkbox" class="status-box" data-status="seen" aria-label="63. The Thick of It — Seen">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Want to see">
+          <input type="checkbox" class="status-box" data-status="want" aria-label="63. The Thick of It — Want to see">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Never heard of it">
+          <input type="checkbox" class="status-box" data-status="never" aria-label="63. The Thick of It — Never heard of it">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+      </div>
+      <div class="show-row" data-index="63">
+        <div class="rank">64.</div>
+        <div class="show-title"><strong>Anthony Bourdain: Parts Unknown</strong> <span class="years">(2013-2018)</span></div>
+        <label class="check-cell" title="Seen">
+          <input type="checkbox" class="status-box" data-status="seen" aria-label="64. Anthony Bourdain: Parts Unknown — Seen">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Want to see">
+          <input type="checkbox" class="status-box" data-status="want" aria-label="64. Anthony Bourdain: Parts Unknown — Want to see">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Never heard of it">
+          <input type="checkbox" class="status-box" data-status="never" aria-label="64. Anthony Bourdain: Parts Unknown — Never heard of it">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+      </div>
+      <div class="show-row" data-index="64">
+        <div class="rank">65.</div>
+        <div class="show-title"><strong>Mare of Easttown</strong> <span class="years">(2021)</span></div>
+        <label class="check-cell" title="Seen">
+          <input type="checkbox" class="status-box" data-status="seen" aria-label="65. Mare of Easttown — Seen">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Want to see">
+          <input type="checkbox" class="status-box" data-status="want" aria-label="65. Mare of Easttown — Want to see">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Never heard of it">
+          <input type="checkbox" class="status-box" data-status="never" aria-label="65. Mare of Easttown — Never heard of it">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+      </div>
+      <div class="show-row" data-index="65">
+        <div class="rank">66.</div>
+        <div class="show-title"><strong>The Rehearsal</strong> <span class="years">(2022-present)</span></div>
+        <label class="check-cell" title="Seen">
+          <input type="checkbox" class="status-box" data-status="seen" aria-label="66. The Rehearsal — Seen">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Want to see">
+          <input type="checkbox" class="status-box" data-status="want" aria-label="66. The Rehearsal — Want to see">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Never heard of it">
+          <input type="checkbox" class="status-box" data-status="never" aria-label="66. The Rehearsal — Never heard of it">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+      </div>
+      <div class="show-row" data-index="66">
+        <div class="rank">67.</div>
+        <div class="show-title"><strong>The Handmaid’s Tale</strong> <span class="years">(2017-2025)</span></div>
+        <label class="check-cell" title="Seen">
+          <input type="checkbox" class="status-box" data-status="seen" aria-label="67. The Handmaid’s Tale — Seen">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Want to see">
+          <input type="checkbox" class="status-box" data-status="want" aria-label="67. The Handmaid’s Tale — Want to see">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Never heard of it">
+          <input type="checkbox" class="status-box" data-status="never" aria-label="67. The Handmaid’s Tale — Never heard of it">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+      </div>
+      <div class="show-row" data-index="67">
+        <div class="rank">68.</div>
+        <div class="show-title"><strong>Ozark</strong> <span class="years">(2017-2022)</span></div>
+        <label class="check-cell" title="Seen">
+          <input type="checkbox" class="status-box" data-status="seen" aria-label="68. Ozark — Seen">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Want to see">
+          <input type="checkbox" class="status-box" data-status="want" aria-label="68. Ozark — Want to see">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Never heard of it">
+          <input type="checkbox" class="status-box" data-status="never" aria-label="68. Ozark — Never heard of it">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+      </div>
+      <div class="show-row" data-index="68">
+        <div class="rank">69.</div>
+        <div class="show-title"><strong>Anthony Bourdain: No Reservations</strong> <span class="years">(2005-2012)</span></div>
+        <label class="check-cell" title="Seen">
+          <input type="checkbox" class="status-box" data-status="seen" aria-label="69. Anthony Bourdain: No Reservations — Seen">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Want to see">
+          <input type="checkbox" class="status-box" data-status="want" aria-label="69. Anthony Bourdain: No Reservations — Want to see">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Never heard of it">
+          <input type="checkbox" class="status-box" data-status="never" aria-label="69. Anthony Bourdain: No Reservations — Never heard of it">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+      </div>
+      <div class="show-row" data-index="69">
+        <div class="rank">70.</div>
+        <div class="show-title"><strong>The Shield</strong> <span class="years">(2002-2008)</span></div>
+        <label class="check-cell" title="Seen">
+          <input type="checkbox" class="status-box" data-status="seen" aria-label="70. The Shield — Seen">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Want to see">
+          <input type="checkbox" class="status-box" data-status="want" aria-label="70. The Shield — Want to see">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Never heard of it">
+          <input type="checkbox" class="status-box" data-status="never" aria-label="70. The Shield — Never heard of it">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+      </div>
+      <div class="show-row" data-index="70">
+        <div class="rank">71.</div>
+        <div class="show-title"><strong>Beef (Season 1)</strong> <span class="years">(2023)</span></div>
+        <label class="check-cell" title="Seen">
+          <input type="checkbox" class="status-box" data-status="seen" aria-label="71. Beef (Season 1) — Seen">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Want to see">
+          <input type="checkbox" class="status-box" data-status="want" aria-label="71. Beef (Season 1) — Want to see">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Never heard of it">
+          <input type="checkbox" class="status-box" data-status="never" aria-label="71. Beef (Season 1) — Never heard of it">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+      </div>
+      <div class="show-row" data-index="71">
+        <div class="rank">72.</div>
+        <div class="show-title"><strong>Squid Game</strong> <span class="years">(2021-2025)</span></div>
+        <label class="check-cell" title="Seen">
+          <input type="checkbox" class="status-box" data-status="seen" aria-label="72. Squid Game — Seen">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Want to see">
+          <input type="checkbox" class="status-box" data-status="want" aria-label="72. Squid Game — Want to see">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Never heard of it">
+          <input type="checkbox" class="status-box" data-status="never" aria-label="72. Squid Game — Never heard of it">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+      </div>
+      <div class="show-row" data-index="72">
+        <div class="rank">73.</div>
+        <div class="show-title"><strong>Barry</strong> <span class="years">(2018-2023)</span></div>
+        <label class="check-cell" title="Seen">
+          <input type="checkbox" class="status-box" data-status="seen" aria-label="73. Barry — Seen">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Want to see">
+          <input type="checkbox" class="status-box" data-status="want" aria-label="73. Barry — Want to see">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Never heard of it">
+          <input type="checkbox" class="status-box" data-status="never" aria-label="73. Barry — Never heard of it">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+      </div>
+      <div class="show-row" data-index="73">
+        <div class="rank">74.</div>
+        <div class="show-title"><strong>The Bear</strong> <span class="years">(2022-2026)</span></div>
+        <label class="check-cell" title="Seen">
+          <input type="checkbox" class="status-box" data-status="seen" aria-label="74. The Bear — Seen">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Want to see">
+          <input type="checkbox" class="status-box" data-status="want" aria-label="74. The Bear — Want to see">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Never heard of it">
+          <input type="checkbox" class="status-box" data-status="never" aria-label="74. The Bear — Never heard of it">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+      </div>
+      <div class="show-row" data-index="74">
+        <div class="rank">75.</div>
+        <div class="show-title"><strong>Ted Lasso</strong> <span class="years">(2020-present)</span></div>
+        <label class="check-cell" title="Seen">
+          <input type="checkbox" class="status-box" data-status="seen" aria-label="75. Ted Lasso — Seen">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Want to see">
+          <input type="checkbox" class="status-box" data-status="want" aria-label="75. Ted Lasso — Want to see">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Never heard of it">
+          <input type="checkbox" class="status-box" data-status="never" aria-label="75. Ted Lasso — Never heard of it">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+      </div>
+      <div class="show-row" data-index="75">
+        <div class="rank">76.</div>
+        <div class="show-title"><strong>Somebody Somewhere</strong> <span class="years">(2022-2024)</span></div>
+        <label class="check-cell" title="Seen">
+          <input type="checkbox" class="status-box" data-status="seen" aria-label="76. Somebody Somewhere — Seen">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Want to see">
+          <input type="checkbox" class="status-box" data-status="want" aria-label="76. Somebody Somewhere — Want to see">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Never heard of it">
+          <input type="checkbox" class="status-box" data-status="never" aria-label="76. Somebody Somewhere — Never heard of it">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+      </div>
+      <div class="show-row" data-index="76">
+        <div class="rank">77.</div>
+        <div class="show-title"><strong>Modern Family</strong> <span class="years">(2009-2020)</span></div>
+        <label class="check-cell" title="Seen">
+          <input type="checkbox" class="status-box" data-status="seen" aria-label="77. Modern Family — Seen">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Want to see">
+          <input type="checkbox" class="status-box" data-status="want" aria-label="77. Modern Family — Want to see">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Never heard of it">
+          <input type="checkbox" class="status-box" data-status="never" aria-label="77. Modern Family — Never heard of it">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+      </div>
+      <div class="show-row" data-index="77">
+        <div class="rank">78.</div>
+        <div class="show-title"><strong>It’s Always Sunny in Philadelphia</strong> <span class="years">(2005-present)</span></div>
+        <label class="check-cell" title="Seen">
+          <input type="checkbox" class="status-box" data-status="seen" aria-label="78. It’s Always Sunny in Philadelphia — Seen">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Want to see">
+          <input type="checkbox" class="status-box" data-status="want" aria-label="78. It’s Always Sunny in Philadelphia — Want to see">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Never heard of it">
+          <input type="checkbox" class="status-box" data-status="never" aria-label="78. It’s Always Sunny in Philadelphia — Never heard of it">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+      </div>
+      <div class="show-row" data-index="78">
+        <div class="rank">79.</div>
+        <div class="show-title"><strong>The Good Wife</strong> <span class="years">(2009-2016)</span></div>
+        <label class="check-cell" title="Seen">
+          <input type="checkbox" class="status-box" data-status="seen" aria-label="79. The Good Wife — Seen">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Want to see">
+          <input type="checkbox" class="status-box" data-status="want" aria-label="79. The Good Wife — Want to see">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Never heard of it">
+          <input type="checkbox" class="status-box" data-status="never" aria-label="79. The Good Wife — Never heard of it">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+      </div>
+      <div class="show-row" data-index="79">
+        <div class="rank">80.</div>
+        <div class="show-title"><strong>How To With John Wilson</strong> <span class="years">(2020-2023)</span></div>
+        <label class="check-cell" title="Seen">
+          <input type="checkbox" class="status-box" data-status="seen" aria-label="80. How To With John Wilson — Seen">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Want to see">
+          <input type="checkbox" class="status-box" data-status="want" aria-label="80. How To With John Wilson — Want to see">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Never heard of it">
+          <input type="checkbox" class="status-box" data-status="never" aria-label="80. How To With John Wilson — Never heard of it">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+      </div>
+      <div class="show-row" data-index="80">
+        <div class="rank">81.</div>
+        <div class="show-title"><strong>The Queen’s Gambit</strong> <span class="years">(2020)</span></div>
+        <label class="check-cell" title="Seen">
+          <input type="checkbox" class="status-box" data-status="seen" aria-label="81. The Queen’s Gambit — Seen">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Want to see">
+          <input type="checkbox" class="status-box" data-status="want" aria-label="81. The Queen’s Gambit — Want to see">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Never heard of it">
+          <input type="checkbox" class="status-box" data-status="never" aria-label="81. The Queen’s Gambit — Never heard of it">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+      </div>
+      <div class="show-row" data-index="81">
+        <div class="rank">82.</div>
+        <div class="show-title"><strong>Better Things</strong> <span class="years">(2016-2022)</span></div>
+        <label class="check-cell" title="Seen">
+          <input type="checkbox" class="status-box" data-status="seen" aria-label="82. Better Things — Seen">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Want to see">
+          <input type="checkbox" class="status-box" data-status="want" aria-label="82. Better Things — Want to see">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Never heard of it">
+          <input type="checkbox" class="status-box" data-status="never" aria-label="82. Better Things — Never heard of it">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+      </div>
+      <div class="show-row" data-index="82">
+        <div class="rank">83.</div>
+        <div class="show-title"><strong>Justified</strong> <span class="years">(2010-2015)</span></div>
+        <label class="check-cell" title="Seen">
+          <input type="checkbox" class="status-box" data-status="seen" aria-label="83. Justified — Seen">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Want to see">
+          <input type="checkbox" class="status-box" data-status="want" aria-label="83. Justified — Want to see">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Never heard of it">
+          <input type="checkbox" class="status-box" data-status="never" aria-label="83. Justified — Never heard of it">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+      </div>
+      <div class="show-row" data-index="83">
+        <div class="rank">84.</div>
+        <div class="show-title"><strong>Planet Earth</strong> <span class="years">(2006)</span></div>
+        <label class="check-cell" title="Seen">
+          <input type="checkbox" class="status-box" data-status="seen" aria-label="84. Planet Earth — Seen">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Want to see">
+          <input type="checkbox" class="status-box" data-status="want" aria-label="84. Planet Earth — Want to see">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Never heard of it">
+          <input type="checkbox" class="status-box" data-status="never" aria-label="84. Planet Earth — Never heard of it">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+      </div>
+      <div class="show-row" data-index="84">
+        <div class="rank">85.</div>
+        <div class="show-title"><strong>The Great British Baking Show</strong> <span class="years">(2010-present)</span></div>
+        <label class="check-cell" title="Seen">
+          <input type="checkbox" class="status-box" data-status="seen" aria-label="85. The Great British Baking Show — Seen">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Want to see">
+          <input type="checkbox" class="status-box" data-status="want" aria-label="85. The Great British Baking Show — Want to see">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Never heard of it">
+          <input type="checkbox" class="status-box" data-status="never" aria-label="85. The Great British Baking Show — Never heard of it">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+      </div>
+      <div class="show-row" data-index="85">
+        <div class="rank">86.</div>
+        <div class="show-title"><strong>Shogun</strong> <span class="years">(2024-present)</span></div>
+        <label class="check-cell" title="Seen">
+          <input type="checkbox" class="status-box" data-status="seen" aria-label="86. Shogun — Seen">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Want to see">
+          <input type="checkbox" class="status-box" data-status="want" aria-label="86. Shogun — Want to see">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Never heard of it">
+          <input type="checkbox" class="status-box" data-status="never" aria-label="86. Shogun — Never heard of it">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+      </div>
+      <div class="show-row" data-index="86">
+        <div class="rank">87.</div>
+        <div class="show-title"><strong>Reservation Dogs</strong> <span class="years">(2021-2023)</span></div>
+        <label class="check-cell" title="Seen">
+          <input type="checkbox" class="status-box" data-status="seen" aria-label="87. Reservation Dogs — Seen">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Want to see">
+          <input type="checkbox" class="status-box" data-status="want" aria-label="87. Reservation Dogs — Want to see">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Never heard of it">
+          <input type="checkbox" class="status-box" data-status="never" aria-label="87. Reservation Dogs — Never heard of it">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+      </div>
+      <div class="show-row" data-index="87">
+        <div class="rank">88.</div>
+        <div class="show-title"><strong>Dexter</strong> <span class="years">(2006-2013)</span></div>
+        <label class="check-cell" title="Seen">
+          <input type="checkbox" class="status-box" data-status="seen" aria-label="88. Dexter — Seen">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Want to see">
+          <input type="checkbox" class="status-box" data-status="want" aria-label="88. Dexter — Want to see">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Never heard of it">
+          <input type="checkbox" class="status-box" data-status="never" aria-label="88. Dexter — Never heard of it">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+      </div>
+      <div class="show-row" data-index="88">
+        <div class="rank">89.</div>
+        <div class="show-title"><strong>Baby Reindeer</strong> <span class="years">(2024)</span></div>
+        <label class="check-cell" title="Seen">
+          <input type="checkbox" class="status-box" data-status="seen" aria-label="89. Baby Reindeer — Seen">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Want to see">
+          <input type="checkbox" class="status-box" data-status="want" aria-label="89. Baby Reindeer — Want to see">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Never heard of it">
+          <input type="checkbox" class="status-box" data-status="never" aria-label="89. Baby Reindeer — Never heard of it">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+      </div>
+      <div class="show-row" data-index="89">
+        <div class="rank">90.</div>
+        <div class="show-title"><strong>Eastbound &amp; Down</strong> <span class="years">(2009-2013)</span></div>
+        <label class="check-cell" title="Seen">
+          <input type="checkbox" class="status-box" data-status="seen" aria-label="90. Eastbound &amp; Down — Seen">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Want to see">
+          <input type="checkbox" class="status-box" data-status="want" aria-label="90. Eastbound &amp; Down — Want to see">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Never heard of it">
+          <input type="checkbox" class="status-box" data-status="never" aria-label="90. Eastbound &amp; Down — Never heard of it">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+      </div>
+      <div class="show-row" data-index="90">
+        <div class="rank">91.</div>
+        <div class="show-title"><strong>Catastrophe</strong> <span class="years">(2015-2019)</span></div>
+        <label class="check-cell" title="Seen">
+          <input type="checkbox" class="status-box" data-status="seen" aria-label="91. Catastrophe — Seen">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Want to see">
+          <input type="checkbox" class="status-box" data-status="want" aria-label="91. Catastrophe — Want to see">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Never heard of it">
+          <input type="checkbox" class="status-box" data-status="never" aria-label="91. Catastrophe — Never heard of it">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+      </div>
+      <div class="show-row" data-index="91">
+        <div class="rank">92.</div>
+        <div class="show-title"><strong>The Night Of</strong> <span class="years">(2016)</span></div>
+        <label class="check-cell" title="Seen">
+          <input type="checkbox" class="status-box" data-status="seen" aria-label="92. The Night Of — Seen">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Want to see">
+          <input type="checkbox" class="status-box" data-status="want" aria-label="92. The Night Of — Want to see">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Never heard of it">
+          <input type="checkbox" class="status-box" data-status="never" aria-label="92. The Night Of — Never heard of it">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+      </div>
+      <div class="show-row" data-index="92">
+        <div class="rank">93.</div>
+        <div class="show-title"><strong>Station Eleven</strong> <span class="years">(2021-2022)</span></div>
+        <label class="check-cell" title="Seen">
+          <input type="checkbox" class="status-box" data-status="seen" aria-label="93. Station Eleven — Seen">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Want to see">
+          <input type="checkbox" class="status-box" data-status="want" aria-label="93. Station Eleven — Want to see">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Never heard of it">
+          <input type="checkbox" class="status-box" data-status="never" aria-label="93. Station Eleven — Never heard of it">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+      </div>
+      <div class="show-row" data-index="93">
+        <div class="rank">94.</div>
+        <div class="show-title"><strong>The Diplomat</strong> <span class="years">(2023-present)</span></div>
+        <label class="check-cell" title="Seen">
+          <input type="checkbox" class="status-box" data-status="seen" aria-label="94. The Diplomat — Seen">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Want to see">
+          <input type="checkbox" class="status-box" data-status="want" aria-label="94. The Diplomat — Want to see">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Never heard of it">
+          <input type="checkbox" class="status-box" data-status="never" aria-label="94. The Diplomat — Never heard of it">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+      </div>
+      <div class="show-row" data-index="94">
+        <div class="rank">95.</div>
+        <div class="show-title"><strong>House</strong> <span class="years">(2004-2012)</span></div>
+        <label class="check-cell" title="Seen">
+          <input type="checkbox" class="status-box" data-status="seen" aria-label="95. House — Seen">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Want to see">
+          <input type="checkbox" class="status-box" data-status="want" aria-label="95. House — Want to see">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Never heard of it">
+          <input type="checkbox" class="status-box" data-status="never" aria-label="95. House — Never heard of it">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+      </div>
+      <div class="show-row" data-index="95">
+        <div class="rank">96.</div>
+        <div class="show-title"><strong>Halt and Catch Fire</strong> <span class="years">(2014-2017)</span></div>
+        <label class="check-cell" title="Seen">
+          <input type="checkbox" class="status-box" data-status="seen" aria-label="96. Halt and Catch Fire — Seen">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Want to see">
+          <input type="checkbox" class="status-box" data-status="want" aria-label="96. Halt and Catch Fire — Want to see">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Never heard of it">
+          <input type="checkbox" class="status-box" data-status="never" aria-label="96. Halt and Catch Fire — Never heard of it">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+      </div>
+      <div class="show-row" data-index="96">
+        <div class="rank">97.</div>
+        <div class="show-title"><strong>Community</strong> <span class="years">(2009-2015)</span></div>
+        <label class="check-cell" title="Seen">
+          <input type="checkbox" class="status-box" data-status="seen" aria-label="97. Community — Seen">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Want to see">
+          <input type="checkbox" class="status-box" data-status="want" aria-label="97. Community — Want to see">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Never heard of it">
+          <input type="checkbox" class="status-box" data-status="never" aria-label="97. Community — Never heard of it">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+      </div>
+      <div class="show-row" data-index="97">
+        <div class="rank">98.</div>
+        <div class="show-title"><strong>The OA</strong> <span class="years">(2016-2019)</span></div>
+        <label class="check-cell" title="Seen">
+          <input type="checkbox" class="status-box" data-status="seen" aria-label="98. The OA — Seen">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Want to see">
+          <input type="checkbox" class="status-box" data-status="want" aria-label="98. The OA — Want to see">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Never heard of it">
+          <input type="checkbox" class="status-box" data-status="never" aria-label="98. The OA — Never heard of it">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+      </div>
+      <div class="show-row" data-index="98">
+        <div class="rank">99.</div>
+        <div class="show-title"><strong>Gilmore Girls</strong> <span class="years">(2000-2007)</span></div>
+        <label class="check-cell" title="Seen">
+          <input type="checkbox" class="status-box" data-status="seen" aria-label="99. Gilmore Girls — Seen">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Want to see">
+          <input type="checkbox" class="status-box" data-status="want" aria-label="99. Gilmore Girls — Want to see">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Never heard of it">
+          <input type="checkbox" class="status-box" data-status="never" aria-label="99. Gilmore Girls — Never heard of it">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+      </div>
+      <div class="show-row" data-index="99">
+        <div class="rank">100.</div>
+        <div class="show-title"><strong>Scandal</strong> <span class="years">(2012-2018)</span></div>
+        <label class="check-cell" title="Seen">
+          <input type="checkbox" class="status-box" data-status="seen" aria-label="100. Scandal — Seen">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Want to see">
+          <input type="checkbox" class="status-box" data-status="want" aria-label="100. Scandal — Want to see">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+        <label class="check-cell" title="Never heard of it">
+          <input type="checkbox" class="status-box" data-status="never" aria-label="100. Scandal — Never heard of it">
+          <span class="box" aria-hidden="true"></span>
+        </label>
+      </div>
+  </section>
+
+  <footer class="footer">
+    Personal checklist · 100 entries · The URL contains the current selection as a binary save ID.
+  </footer>
+</main>
+
+<script>
+(() => {
+  const rows = [...document.querySelectorAll(".show-row")];
+  const boxes = [...document.querySelectorAll(".status-box")];
+  const saveIdEl = document.getElementById("saveId");
+  const currentUrlEl = document.getElementById("currentUrl");
+  const counters = {
+    seen: document.getElementById("seenCount"),
+    want: document.getElementById("wantCount"),
+    never: document.getElementById("neverCount")
+  };
+
+  // Two bits per show. 00 is intentionally reserved for "unclassified".
+  const CODE = { none: "00", seen: "01", want: "10", never: "11" };
+  const STATUS_BY_CODE = { "00": "none", "01": "seen", "10": "want", "11": "never" };
+
+  function getState() {
+    return rows.map(row => {
+      const checked = row.querySelector(".status-box:checked");
+      return checked ? checked.dataset.status : "none";
+    });
+  }
+
+  function stateToBinary(state) {
+    return state.map(status => CODE[status]).join("");
+  }
+
+  function binaryToState(binary) {
+    if (!/^[01]+$/.test(binary) || binary.length !== rows.length * 2) return null;
+    const state = [];
+    for (let i = 0; i < binary.length; i += 2) {
+      state.push(STATUS_BY_CODE[binary.slice(i, i + 2)]);
+    }
+    return state;
+  }
+
+  function applyState(state) {
+    state.forEach((status, index) => {
+      const row = rows[index];
+      row.querySelectorAll(".status-box").forEach(box => {
+        box.checked = box.dataset.status === status;
+      });
+      row.classList.toggle("is-seen", status === "seen");
+      row.classList.toggle("is-want", status === "want");
+      row.classList.toggle("is-never", status === "never");
+    });
+  }
+
+  function updateCounters(state) {
+    for (const key of Object.keys(counters)) {
+      counters[key].textContent = state.filter(s => s === key).length;
+    }
+  }
+
+  function updateUrlAndDisplay() {
+    const state = getState();
+    const binary = stateToBinary(state);
+
+    // Hash is deliberately used instead of query parameters so GitHub Pages
+    // can serve the same static index.html for every save ID.
+    const newUrl = window.location.pathname + window.location.search + "#s=" + binary;
+    window.history.replaceState(null, "", newUrl);
+
+    saveIdEl.textContent = binary;
+    currentUrlEl.textContent = window.location.href;
+    updateCounters(state);
+  }
+
+  function loadFromUrl() {
+    const match = window.location.hash.match(/^#s=([01]+)$/i);
+    const decoded = match ? binaryToState(match[1]) : null;
+
+    if (decoded) {
+      applyState(decoded);
+    } else {
+      applyState(rows.map(() => "none"));
+    }
+
+    const state = getState();
+    saveIdEl.textContent = stateToBinary(state);
+    currentUrlEl.textContent = window.location.href;
+    updateCounters(state);
+  }
+
+  boxes.forEach(box => {
+    box.addEventListener("change", () => {
+      const row = box.closest(".show-row");
+
+      // Treat the three checkboxes as a single-choice group.
+      if (box.checked) {
+        row.querySelectorAll(".status-box").forEach(other => {
+          if (other !== box) other.checked = false;
+        });
+      }
+
+      const state = getState();
+      applyState(state);
+      updateUrlAndDisplay();
+    });
+  });
+
+  window.addEventListener("hashchange", loadFromUrl);
+  loadFromUrl();
+})();
+</script>
+</body>
+</html>
