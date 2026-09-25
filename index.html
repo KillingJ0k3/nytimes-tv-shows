@@ -243,16 +243,15 @@
   <div class="masthead">TV SHOWS</div>
   <h1>The 100 Best TV Shows of the 21st Century</h1>
   <hr class="rule">
-  <!--
-  <section class="save-panel" aria-live="polite">
+
+  <section class="save-panel" aria-live="polite" hidden>
     <div class="save-line">
       <span class="save-label">Save ID (binary)</span>
-      <code id="saveId">0 × 400 bits</code>
+      <code id="saveId">0 × 300 bits</code>
     </div>
     <div class="url" id="currentUrl"></div>
-    <div class="legend">Each show uses 4 bits, one for each checkbox: <b>Seen</b> · <b>Want to see</b> · <b>Don’t want to see</b> · <b>Never heard of it</b>. 100 shows × 4 columns = 400 bits. The ID is encoded in the URL hash, so sharing the URL reproduces the selection.</div>
+    <div class="legend">Each show uses 3 bits: <b>000</b> = unclassified · <b>001</b> = seen · <b>010</b> = want to see · <b>011</b> = don’t want to see · <b>100</b> = never heard of it. The ID is encoded in the URL hash, so sharing the URL reproduces the selection.</div>
 </section>
--->
 
   <div class="table-head">
     <div class="head-spacer"></div>
@@ -2298,130 +2297,134 @@
     never: document.getElementById("neverCount")
   };
 
-  /*
-   * SAVE ID v3
-   *
-   * Four bits per show, one bit for each visible column:
-   *   bit 1 = Seen
-   *   bit 2 = Want to see
-   *   bit 3 = Don't want to see
-   *   bit 4 = Never heard of it
-   *
-   * This is deliberately one bit per checkbox rather than a numeric
-   * 3-bit state code. Therefore EVERY checkbox is represented in the
-   * Save ID, including every entry in the fourth column.
-   *
-   * 100 shows × 4 columns = exactly 400 bits.
-   */
+  // Current format: 3 bits per show.
+  // 000 = unclassified
+  // 001 = seen
+  // 010 = want to see
+  // 011 = don't want to see
+  // 100 = never heard of it
+  const CODE = {
+    none: "000",
+    seen: "001",
+    want: "010",
+    dontwant: "011",
+    never: "100"
+  };
 
-  function getStateBits() {
+  const STATUS_BY_CODE = {
+    "000": "none",
+    "001": "seen",
+    "010": "want",
+    "011": "dontwant",
+    "100": "never"
+  };
+
+  function getState() {
     return rows.map(row => {
-      const status = {
-        seen: row.querySelector('[data-status="seen"]').checked,
-        want: row.querySelector('[data-status="want"]').checked,
-        dontwant: row.querySelector('[data-status="dontwant"]').checked,
-        never: row.querySelector('[data-status="never"]').checked
-      };
-
-      return [
-        status.seen ? "1" : "0",
-        status.want ? "1" : "0",
-        status.dontwant ? "1" : "0",
-        status.never ? "1" : "0"
-      ].join("");
+      const checked = row.querySelector(".status-box:checked");
+      return checked ? checked.dataset.status : "none";
     });
   }
 
-  function bitsToBinary(bits) {
-    return bits.join("");
+  function stateToBinary(state) {
+    return state.map(status => CODE[status] || CODE.none).join("");
   }
 
-  function binaryToBits(binary) {
+  function binaryToState(binary) {
     if (!/^[01]+$/.test(binary)) return null;
 
-    // Current format: 4 bits/show = every checkbox is stored.
-    if (binary.length === rows.length * 4) {
-      const bits = [];
-
-      for (let i = 0; i < binary.length; i += 4) {
-        bits.push(binary.slice(i, i + 4));
-      }
-
-      return bits;
-    }
-
-    /*
-     * Backward compatibility:
-     * The previous 300-bit format stored 3 checkbox bits per show:
-     * Seen, Want, Never.
-     *
-     * Insert the new Don't Want bit as 0 between Want and Never.
-     */
+    // Current 3-bit format.
     if (binary.length === rows.length * 3) {
-      const bits = [];
+      const state = [];
 
       for (let i = 0; i < binary.length; i += 3) {
-        const oldBits = binary.slice(i, i + 3);
-        bits.push(oldBits[0] + oldBits[1] + "0" + oldBits[2]);
+        const code = binary.slice(i, i + 3);
+        const status = STATUS_BY_CODE[code];
+
+        // 101, 110 and 111 are reserved/invalid.
+        if (!status) return null;
+
+        state.push(status);
       }
 
-      return bits;
+      return state;
+    }
+
+    // Backward compatibility with the original 2-bit format.
+    if (binary.length === rows.length * 2) {
+      const oldMap = {
+        "00": "none",
+        "01": "seen",
+        "10": "want",
+        "11": "never"
+      };
+
+      const state = [];
+
+      for (let i = 0; i < binary.length; i += 2) {
+        state.push(oldMap[binary.slice(i, i + 2)]);
+      }
+
+      return state;
     }
 
     return null;
   }
 
-  function applyBits(bits) {
-    bits.forEach((value, index) => {
+  function applyState(state) {
+    state.forEach((status, index) => {
       const row = rows[index];
 
-      row.querySelector('[data-status="seen"]').checked = value[0] === "1";
-      row.querySelector('[data-status="want"]').checked = value[1] === "1";
-      row.querySelector('[data-status="dontwant"]').checked = value[2] === "1";
-      row.querySelector('[data-status="never"]').checked = value[3] === "1";
+      row.querySelectorAll(".status-box").forEach(box => {
+        box.checked = box.dataset.status === status;
+      });
 
-      row.classList.toggle("is-seen", value[0] === "1");
-      row.classList.toggle("is-want", value[1] === "1");
-      row.classList.toggle("is-dontwant", value[2] === "1");
-      row.classList.toggle("is-never", value[3] === "1");
+      row.classList.toggle("is-seen", status === "seen");
+      row.classList.toggle("is-want", status === "want");
+      row.classList.toggle("is-dontwant", status === "dontwant");
+      row.classList.toggle("is-never", status === "never");
     });
   }
 
-  function updateCounters(bits) {
-    counters.seen.textContent = bits.filter(b => b[0] === "1").length;
-    counters.want.textContent = bits.filter(b => b[1] === "1").length;
-    counters.dontwant.textContent = bits.filter(b => b[2] === "1").length;
-    counters.never.textContent = bits.filter(b => b[3] === "1").length;
+  function updateCounters(state) {
+    // Always update all four counters, including zero.
+    counters.seen.textContent = state.filter(s => s === "seen").length;
+    counters.want.textContent = state.filter(s => s === "want").length;
+    counters.dontwant.textContent = state.filter(s => s === "dontwant").length;
+    counters.never.textContent = state.filter(s => s === "never").length;
   }
 
-  function render(bits, updateUrl = false) {
-    applyBits(bits);
-    updateCounters(bits);
+  function render(state, updateUrl = false) {
+    applyState(state);
+    updateCounters(state);
 
-    const binary = bitsToBinary(bits);
-    saveIdEl.textContent = binary;
+    const binary = stateToBinary(state);
+    if (saveIdEl) saveIdEl.textContent = binary;
 
     if (updateUrl) {
       const newUrl =
         window.location.pathname +
         window.location.search +
-        "#v3=" +
+        "#v2=" +
         binary;
 
       window.history.replaceState(null, "", newUrl);
     }
 
-    currentUrlEl.textContent = window.location.href;
+    if (currentUrlEl) currentUrlEl.textContent = window.location.href;
   }
 
   function loadFromUrl() {
-    const match = window.location.hash.match(/^#(?:v3|v2|s)=([01]+)$/i);
-    const bits = match ? binaryToBits(match[1]) : null;
+    const hash = window.location.hash;
 
-    if (bits) {
-      render(bits, false);
+    // Accept both the new #v2=... format and the old #s=... format.
+    const match = hash.match(/^#(?:v2|s)=([01]+)$/i);
+    const decoded = match ? binaryToState(match[1]) : null;
+
+    if (decoded) {
+      render(decoded, false);
     } else {
-      render(rows.map(() => "0000"), false);
+      render(rows.map(() => "none"), false);
     }
   }
 
@@ -2429,23 +2432,22 @@
     box.addEventListener("change", () => {
       const row = box.closest(".show-row");
 
-      /*
-       * Keep the four statuses mutually exclusive when the user changes
-       * the UI, while still preserving every bit in the Save ID.
-       */
+      // A show can have exactly one status.
       if (box.checked) {
         row.querySelectorAll(".status-box").forEach(other => {
-          if (other !== box) other.checked = false;
+          if (other !== box) {
+            other.checked = false;
+          }
         });
       }
 
-      render(getStateBits(), true);
+      render(getState(), true);
     });
   });
 
   window.addEventListener("hashchange", loadFromUrl);
 
-  // Initialize BOTH the checkboxes and all counters on page load.
+  // Important: initialize state AND counters when the page opens.
   loadFromUrl();
 })();
 </script>
